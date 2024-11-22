@@ -193,36 +193,40 @@ const ViewExpense = () => {
 
       <ExpenseList>
         {expenses.length > 0 ? (
-          expenses.map((expense) => (
-            <ExpenseItem key={expense._id}>
-              <ExpenseDetails>
-                <div>
-                  <strong>{expense.expenseName}</strong> - {expense.expenseType}
-                </div>
-                <div>
-                  <small>
-                    Date: {new Date(expense.date).toLocaleDateString()} | Issued To:{" "}
-                    {expense.issuedTo}
-                  </small>
-                </div>
-                <div>
-                  <strong>${expense.amount.toFixed(2)}</strong>
-                </div>
-              </ExpenseDetails>
-              <ActionIcons>
-                <IconButton onClick={() => handleEdit(expense._id)}>
-                  <FaEdit />
-                </IconButton>
-                <IconButton onClick={() => deleteExpense(expense._id)}>
-                  <FaTrash />
-                </IconButton>
-              </ActionIcons>
-            </ExpenseItem>
-          ))
+          expenses
+            .slice()
+            .reverse()
+            .map((expense) => (
+              <ExpenseItem key={expense._id}>
+                <ExpenseDetails>
+                  <div>
+                    <strong>{expense.expenseName}</strong> - {expense.expenseType}
+                  </div>
+                  <div>
+                    <small>
+                      Date: {new Date(expense.date).toLocaleDateString()} | Issued To:{" "}
+                      {expense.issuedTo}
+                    </small>
+                  </div>
+                  <div>
+                    <strong>${expense.amount.toFixed(2)}</strong>
+                  </div>
+                </ExpenseDetails>
+                <ActionIcons>
+                  <IconButton onClick={() => handleEdit(expense._id)}>
+                    <FaEdit />
+                  </IconButton>
+                  <IconButton onClick={() => deleteExpense(expense._id)}>
+                    <FaTrash />
+                  </IconButton>
+                </ActionIcons>
+              </ExpenseItem>
+            ))
         ) : (
           <div>No expenses found for this period.</div>
         )}
       </ExpenseList>
+
     </PageContainer>
   );
 };
