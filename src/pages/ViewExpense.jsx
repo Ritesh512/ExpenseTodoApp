@@ -116,7 +116,7 @@ const ViewExpense = () => {
 
       const data = await response.json();
       setExpenses(data);
-      
+
     } catch (error) {
       setError("Failed to fetch expenses. Please try again.");
     }
@@ -175,12 +175,17 @@ const ViewExpense = () => {
         <div>
           <label>Year: </label>
           <Select value={year} onChange={(e) => setYear(e.target.value)}>
-            {Array.from({ length: 10 }, (_, i) => (
-              <option key={i} value={2024 - i}>
-                {2024 - i}
-              </option>
-            ))}
+            {Array.from({ length: 10 }, (_, i) => {
+              const currentYear = new Date().getFullYear();
+              const yearOption = currentYear - i;
+              return (
+                <option key={yearOption} value={yearOption}>
+                  {yearOption}
+                </option>
+              );
+            })}
           </Select>
+
         </div>
       </DropdownContainer>
 

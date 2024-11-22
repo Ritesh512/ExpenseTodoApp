@@ -139,14 +139,14 @@ const Dashboard = () => {
         <VerticalLine />
         <div className="stats">
           <p>Pending Tasks: {profile.todo_pending_count}</p>
-          <p>Done Tasks: {profile.todo_done_count}</p>
+          {/* <p>Done Tasks: {profile.todo_done_count}</p> */}
           <p>Current Month Spend: ₹{profile.current_month_expense}</p>
           <p>
             Top Expense: {profile.top_expense?.expenseType} (₹
             {profile.top_expense?.amount})
           </p>
           <p>Last Month Spend: ₹{profile.last_month_expense}</p>
-          <p>Current Month to Date: ₹{profile.current_month_to_date}</p>
+          {/* <p>Current Month to Date: ₹{profile.current_month_to_date}</p> */}
         </div>
       </UserProfile>
 

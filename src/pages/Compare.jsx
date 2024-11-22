@@ -68,7 +68,7 @@ const Compare = () => {
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth(); // 0-based index (0 = January, 11 = December)
   const currentYear = currentDate.getFullYear(); // e.g., 2024
-  
+
   const [month1, setMonth1] = useState(months[currentMonth]);
   const [year1, setYear1] = useState(String(currentYear));
   const [month2, setMonth2] = useState(months[currentMonth]);
@@ -208,11 +208,15 @@ const Compare = () => {
             value={year1}
             onChange={(e) => setYear1(parseInt(e.target.value))}
           >
-            {[2023, 2024, 2025].map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
+            {Array.from({ length: 10 }, (_, i) => {
+              const currentYear = new Date().getFullYear();
+              const yearOption = currentYear - i;
+              return (
+                <option key={yearOption} value={yearOption}>
+                  {yearOption}
+                </option>
+              );
+            })}
           </Dropdown>
         </div>
         <div>
@@ -236,12 +240,17 @@ const Compare = () => {
             value={year2}
             onChange={(e) => setYear2(parseInt(e.target.value))}
           >
-            {[2023, 2024, 2025].map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
+            {Array.from({ length: 10 }, (_, i) => {
+              const currentYear = new Date().getFullYear();
+              const yearOption = currentYear - i;
+              return (
+                <option key={yearOption} value={yearOption}>
+                  {yearOption}
+                </option>
+              );
+            })}
           </Dropdown>
+
         </div>
       </div>
 

@@ -141,7 +141,7 @@ const Login = () => {
           />
           <SelectRole value={role} onChange={(e) => setRole(e.target.value)}>
             <option value="user">User</option>
-            <option value="admin">Club Admin</option>
+            {/* <option value="admin">Club Admin</option> */}
           </SelectRole>
           <SubmitButton type="submit">Login</SubmitButton>
         </LoginForm>
