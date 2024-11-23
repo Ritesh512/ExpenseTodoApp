@@ -68,7 +68,7 @@ npm install
 Start the Development Server
 To start the app locally, use the command:
 
-npm start
+npm run dev
 ```
 ### Open the App
 Once the server is running, open your browser and navigate to:
