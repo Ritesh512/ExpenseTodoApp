@@ -9,11 +9,28 @@ const Card = styled.div`
   padding: 20px;
   width: 100%;
   max-width: 400px;
+
+  @media (max-width: 768px) {
+    padding: 15px;
+    max-width: 100%;
+  }
+
+  @media (max-width: 480px) {
+    padding: 10px;
+  }
 `;
 
 const Title = styled.h4`
   font-size: 18px;
   margin-bottom: 10px;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 14px;
+  }
 `;
 
 const FallbackMessage = styled.div`
@@ -21,6 +38,14 @@ const FallbackMessage = styled.div`
   color: #888;
   padding: 20px;
   font-size: 16px;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 12px;
+  }
 `;
 
 const ProfileChart = ({ title, data = [], type }) => {
@@ -42,51 +67,38 @@ const ProfileChart = ({ title, data = [], type }) => {
         },
         series: data.map((item) => parseFloat(item.percentage)),
       };
-    }
-
-    if (type === 'bar') {
+    } else if (type === 'bar') {
       // Bar Chart
-      const seriesData = data.map((item) => item.amount);
       return {
         options: {
-          chart: {
-            type: 'bar',
-            height: 350,
-          },
           xaxis: {
             categories: data.map((item) => item.category),
-            title: {
-              text: 'Categories',
-            },
           },
           yaxis: {
             title: {
-              text: 'Amount ($)',
+              text: 'Amount (₹)',
             },
-          },
-          title: {
-            text: 'Spending by Category',
-            align: 'center',
-            style: {
-              fontSize: '18px',
-              fontWeight: 'bold',
-              color: '#333',
+            labels: {
+              formatter: function (value) {
+                if (value >= 100000) {
+                  return (value / 100000).toFixed(2) + 'L';
+                } else if (value >= 1000) {
+                  return (value / 1000).toFixed(2) + 'k';
+                } else {
+                  return value.toFixed(1);
+                }
+              },
             },
           },
         },
         series: [
           {
             name: 'Amount',
-            data: seriesData,
+            data: data.map((item) => item.amount),
           },
         ],
       };
     }
-
-    return {
-      options: {},
-      series: [],
-    };
   };
 
   const chartData = transformData();
@@ -95,7 +107,13 @@ const ProfileChart = ({ title, data = [], type }) => {
     <Card>
       <Title>{title}</Title>
       {chartData ? (
-        <Chart options={chartData.options} series={chartData.series} type={type} width="100%" />
+        <Chart 
+          options={chartData.options} 
+          series={chartData.series} 
+          type={type} 
+          width="100%" 
+          height="auto" // Ensure responsive height
+        />
       ) : (
         <FallbackMessage>No data available</FallbackMessage>
       )}

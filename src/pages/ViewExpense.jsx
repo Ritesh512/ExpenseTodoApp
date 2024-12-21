@@ -209,7 +209,7 @@ const ViewExpense = () => {
                     </small>
                   </div>
                   <div>
-                    <strong>${expense.amount.toFixed(2)}</strong>
+                    <strong>₹{expense.amount.toFixed(2)}</strong>
                   </div>
                 </ExpenseDetails>
                 <ActionIcons>

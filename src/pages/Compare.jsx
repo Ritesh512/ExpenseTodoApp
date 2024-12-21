@@ -8,6 +8,15 @@ const CompareContainer = styled.div`
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: 15px;
+    max-width: 100%; /* Full width on smaller screens */
+  }
+
+  @media (max-width: 480px) {
+    padding: 10px;
+  }
 `;
 
 const Dropdown = styled.select`
@@ -22,31 +31,60 @@ const Dropdown = styled.select`
     border-color: #4caf50;
     outline: none;
   }
+
+  @media (max-width: 768px) {
+    width: 150px; /* Adjust width for mobile */
+    margin: 10px;
+  }
+
+  @media (max-width: 480px) {
+    width: 120px; /* Further reduce width for very small screens */
+    font-size: 14px;
+  }
 `;
 
 const ChartContainer = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   margin-top: 20px;
   margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const Card = styled.div`
-  background: #ffffff; /* White background for the card */
+  background: #ffffff;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  width: 450px; /* Width of the card */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 450px;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    width: 90%; /* Adjust width for smaller screens */
+    margin-bottom: 15px;
+  }
+
+  @media (max-width: 480px) {
+    width: 100%; /* Full width for very small screens */
+  }
 `;
 
 const ChartTitle = styled.h4`
   text-align: center;
   margin-bottom: 15px;
   font-size: 18px;
-  color: #333; /* Darker text for the title */
+  color: #333;
+
+  @media (max-width: 768px) {
+    font-size: 16px; /* Adjust font size for mobile */
+  }
 `;
 
 const months = [
@@ -66,8 +104,8 @@ const months = [
 
 const Compare = () => {
   const currentDate = new Date();
-  const currentMonth = currentDate.getMonth(); // 0-based index (0 = January, 11 = December)
-  const currentYear = currentDate.getFullYear(); // e.g., 2024
+  const currentMonth = currentDate.getMonth(); // 0-based index
+  const currentYear = currentDate.getFullYear(); // current year
 
   const [month1, setMonth1] = useState(months[currentMonth]);
   const [year1, setYear1] = useState(String(currentYear));
@@ -122,14 +160,14 @@ const Compare = () => {
       enabled: true,
     },
     colors: [
-      "#00E396", // Green (Custom)
-      "#FEB019", // Orange (Retail)
-      "#FF4560", // Red (Electronic)
-      "#775DD0", // Purple (Food)
-      "#008FFB", // Blue (Travel)
-      "#00D9E9", // Teal (Utilities)
-      "#FF66C3", // Pink (Other)
-      "#D4AC2B"  // Gold (Extra Type)
+      "#00E396", // Green
+      "#FEB019", // Orange
+      "#FF4560", // Red
+      "#775DD0", // Purple
+      "#008FFB", // Blue
+      "#00D9E9", // Teal
+      "#FF66C3", // Pink
+      "#D4AC2B",  // Gold
     ],
     legend: {
       position: "bottom",
@@ -179,14 +217,9 @@ const Compare = () => {
     };
   };
 
-
-
-
-
   return (
     <CompareContainer>
-      {/* <h1>Compare Expenses</h1> */}
-      <div style={{ display: "flex", gap: "20px" }}>
+      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
         <div>
           <h3>Chart 1</h3>
           <Dropdown
@@ -250,7 +283,6 @@ const Compare = () => {
               );
             })}
           </Dropdown>
-
         </div>
       </div>
 
@@ -259,38 +291,38 @@ const Compare = () => {
           <div>
             <ChartTitle>{month1.name}</ChartTitle>
             {
-              chartData1.length === 0 ?
+              chartData1.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "20px", color: "#888" }}>
                   No data available
                 </div>
-                :
+              ) : (
                 <Chart
                   options={{ ...chartOptions, labels: prepareChartData(chartData1).labels }}
                   series={prepareChartData(chartData1).series}
                   type="donut"
                   width="400"
                 />
+              )
             }
-
           </div>
         </Card>
         <Card>
           <div>
             <ChartTitle>{month2.name}</ChartTitle>
             {
-              chartData2.length === 0 ?
+              chartData2.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "20px", color: "#888" }}>
                   No data available
                 </div>
-                :
+              ) : (
                 <Chart
                   options={{ ...chartOptions, labels: prepareChartData(chartData2).labels }}
                   series={prepareChartData(chartData2).series}
                   type="donut"
                   width="400"
                 />
+              )
             }
-
           </div>
         </Card>
       </ChartContainer>

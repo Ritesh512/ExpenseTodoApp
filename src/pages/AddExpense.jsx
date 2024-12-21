@@ -3,6 +3,7 @@ import ExpenseForm from '../ui/ExpenseForm';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+
 const AddExpense = () => {
   const navigate = useNavigate();
 

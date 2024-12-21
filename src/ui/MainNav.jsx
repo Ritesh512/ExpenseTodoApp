@@ -1,21 +1,27 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import {
-  HiOutlineCalendarDays,
-  HiOutlineCog6Tooth,
   HiOutlineHome,
 } from "react-icons/hi2";
-import { AiFillLike } from "react-icons/ai";
-import { MdOutlineDataSaverOn } from "react-icons/md";
 import { FcTodoList } from "react-icons/fc";
-import { LiaBirthdayCakeSolid } from "react-icons/lia";
 import { GiReceiveMoney } from "react-icons/gi";
+import { LiaBirthdayCakeSolid } from "react-icons/lia";
 
-
+// Styling the NavList
 const NavList = styled.ul`
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+  list-style: none;
+  padding: 0;
+
+  /* Horizontal layout for smaller screens */
+  @media (max-width: 1024px) {
+    flex-direction: row;
+    gap: 1rem;
+    overflow-x: auto; /* Allows scrolling if there are too many items */
+    white-space: nowrap;
+  }
 `;
 
 const StyledNavLink = styled(NavLink)`
@@ -32,7 +38,6 @@ const StyledNavLink = styled(NavLink)`
     transition: all 0.3s;
   }
 
-  /* This works because react-router places the active class on the active NavLink */
   &:hover,
   &:active,
   &.active:link,
@@ -57,47 +62,46 @@ const StyledNavLink = styled(NavLink)`
   }
 `;
 
+const Text = styled.span`
+  /* Hide text on mobile and tablet screens */
+  @media (max-width: 1024px) {
+    display: none;
+  }
+`;
+
 function MainNav() {
   const auth = localStorage.getItem("user");
   const naviagte = useNavigate();
   if (!auth) {
     naviagte("/signup");
   }
+
   return (
     <nav>
       <NavList>
-          <>
-            <li>
-              <StyledNavLink to="/dashboard">
-                <HiOutlineHome />
-                <span>Home</span>
-              </StyledNavLink>
-            </li>
-            <li>
-              <StyledNavLink to="/todo/default">
-                <FcTodoList />
-                <span>Todo</span>
-              </StyledNavLink>
-            </li>
-            <li>
-              <StyledNavLink to="/expenses">
-                <GiReceiveMoney />
-                <span>Expenses</span>
-              </StyledNavLink>
-            </li>
-            <li>
-              <StyledNavLink to="/birthday">
-              <LiaBirthdayCakeSolid />
-                <span>Birthday</span>
-              </StyledNavLink>
-            </li>
-          </>
-        
         <li>
-          {/* <StyledNavLink to="/settings">
-            <HiOutlineCog6Tooth />
-            <span>Settings</span>
-          </StyledNavLink> */}
+          <StyledNavLink to="/dashboard">
+            <HiOutlineHome />
+            <Text>Home</Text>
+          </StyledNavLink>
+        </li>
+        <li>
+          <StyledNavLink to="/todo/default">
+            <FcTodoList />
+            <Text>Todo</Text>
+          </StyledNavLink>
+        </li>
+        <li>
+          <StyledNavLink to="/expenses">
+            <GiReceiveMoney />
+            <Text>Expenses</Text>
+          </StyledNavLink>
+        </li>
+        <li>
+          <StyledNavLink to="/birthday">
+            <LiaBirthdayCakeSolid />
+            <Text>Birthday</Text>
+          </StyledNavLink>
         </li>
       </NavList>
     </nav>

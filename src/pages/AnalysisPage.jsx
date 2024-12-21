@@ -7,19 +7,32 @@ import GraphCard from '../ui/GraphCard';
 import Filters from '../ui/Filters';
 import { LineChart } from '@mui/x-charts/LineChart';
 
-
 const AnalysisContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
   padding: 20px;
+  
+  @media (max-width: 768px) {
+    padding: 15px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 10px;
+  }
 `;
 
 const FilterHeader = styled.div`
   display: flex;
-  justify-content: space-around;
-  align-items: center; /* Optional, to align items vertically */
-  gap: 20px; /* Adds space between child elements */
+  justify-content: space-between;
+  align-items: center; 
+  gap: 20px;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `;
 
 const ChartsContainer = styled.div`
@@ -31,6 +44,8 @@ const ChartsContainer = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
+    gap: 20px;  // Smaller gap between charts on mobile
+    margin-bottom: 70px;
   }
 `;
 
@@ -47,11 +62,28 @@ const Card = styled.div`
   padding: 20px;
   width: 100%;
   max-width: 400px;
+  
+  @media (max-width: 768px) {
+    max-width: 90%;  // Adjust card width for tablets
+  }
+
+  @media (max-width: 480px) {
+    max-width: 100%;  // Full width on small mobile screens
+    padding: 15px;
+  }
 `;
 
 const Title = styled.h4`
   font-size: 18px;
   margin-bottom: 10px;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 14px;
+  }
 `;
 
 const AnalysisPage = () => {
@@ -75,7 +107,6 @@ const AnalysisPage = () => {
         setCategoryBreakdown(categoryData || {});
 
         const trendData = await getSpendingTrends(filters);
-        // setSpendingTrends(trendData || []);
         const xData = trendData.spendingTrends.map((entry) => entry.date);
         const yData = trendData.spendingTrends.map((entry) => entry.amount);
 
@@ -84,11 +115,8 @@ const AnalysisPage = () => {
         const topExpensesData = await getTopExpenses(filters);
         setTopExpenses(topExpensesData || []);
 
-
         const lowExpensesData = await getLowExpenses(filters);
         setLowExpenses(lowExpensesData || []);
-
-
       } catch (err) {
         console.error(err);
         setError('Failed to fetch analysis data. Please try again later.');
@@ -100,13 +128,12 @@ const AnalysisPage = () => {
 
   return (
     <AnalysisContainer>
-      <FilterHeader >
+      <FilterHeader>
         <Filters setFilters={setFilters} />
         {error && <ErrorMessage>{error}</ErrorMessage>}
-        <SummaryCard
-          totalSpending={categoryBreakdown?.totalSpending || 0}
-        />
+        <SummaryCard totalSpending={categoryBreakdown?.totalSpending || 0} />
       </FilterHeader>
+
       <ChartsContainer>
         <GraphCard
           title="Category Breakdown"
@@ -118,19 +145,18 @@ const AnalysisPage = () => {
           <Title>Spending Trends</Title>
           {spendingTrends && spendingTrends.xData?.length && spendingTrends.yData?.length ? (
             <LineChart
-              xAxis={[{ data: spendingTrends.xData, scaleType: "time" }]} // Time scale for dates
+              xAxis={[{ data: spendingTrends.xData, scaleType: 'time' }]} // Time scale for dates
               series={[{ data: spendingTrends.yData }]}
-              width={400}
+              width={385}
               height={300}
               grid={{ vertical: true, horizontal: true }}
             />
           ) : (
-            <div style={{ textAlign: "center", padding: "20px", color: "#888" }}>
-            No data available
+            <div style={{ textAlign: 'center', padding: '20px', color: '#888' }}>
+              No data available
             </div>
           )}
         </Card>
-
 
         <GraphCard
           title="Top Expenses"
@@ -143,7 +169,6 @@ const AnalysisPage = () => {
           data={lowExpenses.lowestExpenses || []}
           type="bar"
         />
-
       </ChartsContainer>
     </AnalysisContainer>
   );

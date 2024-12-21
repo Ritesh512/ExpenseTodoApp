@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
+// Container for the form
 const FormContainer = styled.div`
   padding: 20px;
-  background-color: #fff; /* Neutral background color */
+  background-color: #fff;
   max-width: 500px;
   margin: 0 auto;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    padding: 15px;
+    max-width: 100%; /* Full width on smaller screens */
+  }
 `;
 
+// Input fields styling
 const Input = styled.input`
   width: 100%;
   padding: 10px;
@@ -18,8 +25,13 @@ const Input = styled.input`
   border: 1px solid #ddd;
   font-size: 16px;
   box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
 `;
 
+// Select dropdown styling
 const Select = styled.select`
   width: 100%;
   padding: 10px;
@@ -34,19 +46,40 @@ const Select = styled.select`
     outline: none;
   }
 
+  @media (max-width: 768px) {
+    font-size: 14px; /* Adjust font size for smaller screens */
+  }
+
+  @media (max-width: 480px) {
+    font-size: 12px; /* Smaller font size for extra small screens */
+  }
+
+  /* Target the dropdown options for smaller screens */
+  @media (max-width: 480px) {
+    option {
+      font-size: 12px; /* Smaller font size for dropdown options */
+      padding: 8px; /* Reduce padding for smaller options */
+    }
+  }
 `;
 
+// Button styling
 const Button = styled.button`
-  background-color: #4caf50; /* Updated button color */
+  background-color: #4caf50;
   color: white;
   padding: 12px 20px;
   font-size: 16px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  
+
   &:hover {
     background-color: #45a049;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 14px; /* Smaller font size on mobile */
+    padding: 10px 18px;
   }
 `;
 
@@ -93,12 +126,14 @@ const ExpenseForm = ({ initialData = {}, onSubmit, submitButtonText }) => {
                     onChange={(e) => setExpenseType(e.target.value)}
                 >
                     {/* Dropdown options */}
-                    <option value="Custom">Custom</option>
                     <option value="Retail">Retail</option>
                     <option value="Electronic">Electronic</option>
                     <option value="Food">Food</option>
                     <option value="Travel">Travel</option>
                     <option value="Utilities">Utilities</option>
+                    <option value="Gold">Gold</option>
+                    <option value="SIP">SIP</option>
+                    <option value="Medicine">Medicine</option>
                     <option value="Other">Other</option>
                 </Select>
                 <Input

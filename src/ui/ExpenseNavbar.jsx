@@ -10,6 +10,17 @@ const NavbarContainer = styled.nav`
   justify-content: center;
   align-items: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  flex-wrap: wrap; /* Allow the items to wrap if needed */
+  
+  /* Always arrange links in a row, even on smaller screens */
+  flex-direction: row;
+  justify-content: space-between;
+
+  /* Adjustments for smaller screens */
+  @media (max-width: 768px) {
+    padding: 15px; /* Adjust padding for smaller screens */
+    gap: 10px; /* Add gap between links */
+  }
 `;
 
 const StyledNavLink = styled(NavLink)`
@@ -31,6 +42,13 @@ const StyledNavLink = styled(NavLink)`
   &:hover {
     transform: scale(1.05); /* Slight zoom effect */
     background-color: rgba(255, 255, 255, 0.15); /* Light hover effect */
+  }
+
+  /* Adjust for smaller screens */
+  @media (max-width: 768px) {
+    font-size: 16px; /* Slightly smaller font on smaller screens */
+    padding: 8px 15px; /* Adjust padding for better spacing */
+    margin: 0 8px; /* Reduce margin for better fit on small screens */
   }
 `;
 

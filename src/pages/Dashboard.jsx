@@ -10,6 +10,11 @@ const DashboardContainer = styled.div`
   padding: 20px;
   background-color: #f9f9f9;
   min-height: 100vh;
+
+  @media (max-width: 768px) {
+    padding: 10px;
+    gap: 15px;
+  }
 `;
 
 const Section = styled.div`
@@ -17,6 +22,10 @@ const Section = styled.div`
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    padding: 15px;
+  }
 `;
 
 const UserProfile = styled(Section)`
@@ -29,6 +38,11 @@ const UserProfile = styled(Section)`
     width: 80px;
     height: 80px;
     object-fit: cover;
+
+    @media (max-width: 768px) {
+      width: 60px;
+      height: 60px;
+    }
   }
 
   .info {
@@ -39,7 +53,16 @@ const UserProfile = styled(Section)`
     display: flex;
     flex-direction: column;
     gap: 5px;
-    font-weight:800px;
+    font-weight: 800;
+
+    @media (max-width: 768px) {
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
   }
 `;
 
@@ -47,10 +70,13 @@ const VerticalLine = styled.div`
   width: 2px;
   background: #ddd;
   margin: 0 15px;
-  height: auto; /* Dynamically adjusts */
-  align-self: stretch; /* Stretches vertically to match siblings */
-`;
+  height: auto;
+  align-self: stretch;
 
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
 
 const MarqueeSection = styled(Section)`
   overflow: hidden;
@@ -59,7 +85,11 @@ const MarqueeSection = styled(Section)`
   marquee {
     font-size: 1.5rem;
     color: #555;
-    font-weight: 600px;
+    font-weight: 600;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
   }
 `;
 
@@ -67,13 +97,26 @@ const ExpenseSection = styled(Section)`
   display: flex;
   flex-direction: column;
   gap: 20px;
+  margin-bottom: 55px; /* Add margin-bottom to create space */
 
   .chart-container {
     display: flex;
     justify-content: space-around;
     gap: 20px;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  @media (max-width: 768px) {
+    h2 {
+      font-size: 1.2rem;
+    }
   }
 `;
+
 
 // Component
 const Dashboard = () => {
@@ -162,8 +205,8 @@ const Dashboard = () => {
       <ExpenseSection>
         <h2>Expense Report</h2>
         <div className="chart-container">
-          <ProfileChart title="Expense Breakdown" data={expense?.barChartData|| []} type="bar" />
-          <ProfileChart title="Expense Breakdown" data={expense?.pieChartData|| []} type="donut" />
+          <ProfileChart title="Expense Bar Chart" data={expense?.barChartData|| []} type="bar" />
+          <ProfileChart title="Expense Donut Chart" data={expense?.pieChartData|| []} type="donut" />
         </div>
       </ExpenseSection>
     </DashboardContainer>
