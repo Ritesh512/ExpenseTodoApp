@@ -6,6 +6,7 @@ import SummaryCard from '../ui/SummaryCard';
 import GraphCard from '../ui/GraphCard';
 import Filters from '../ui/Filters';
 import { LineChart } from '@mui/x-charts/LineChart';
+import { useNavigate } from "react-router-dom";
 
 const AnalysisContainer = styled.div`
   display: flex;
@@ -98,6 +99,7 @@ const AnalysisPage = () => {
     return { startDate: startOfMonth, endDate: endOfMonth };
   });
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,9 +121,18 @@ const AnalysisPage = () => {
         setLowExpenses(lowExpensesData || []);
       } catch (err) {
         console.error(err);
-        setError('Failed to fetch analysis data. Please try again later.');
+        if (
+          err.message.includes("Authentication failed") ||
+          err.message.includes("Invalid or expired token")
+        ) {
+          // Handle logout on authentication failure
+          localStorage.clear();
+          navigate("/login");
+        } else {
+          setError("Failed to fetch analysis data. Please try again later.");
+        }
       }
-    };
+    }
 
     fetchData();
   }, [filters]);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ExpenseForm from '../ui/ExpenseForm';
 import { toast } from 'react-toastify';
+import checkAuth from '../api/checkauth';
 
 const EditExpense = () => {
   const { id } = useParams(); // Get the expense ID from URL
@@ -19,6 +20,12 @@ const EditExpense = () => {
             authorization: `bearer ${token}`,
           },
         });
+
+        const isAuthValid = await checkAuth(response);
+        if (!isAuthValid) {
+            navigate("/login");
+            return;
+        }
 
         if (!response.ok) {
           throw new Error("Failed to fetch expense data");
@@ -46,6 +53,12 @@ const EditExpense = () => {
         },
         body: JSON.stringify(expenseData),
       });
+
+      const isAuthValid = await checkAuth(response);
+        if (!isAuthValid) {
+            navigate("/login");
+            return;
+        }
 
       if (!response.ok) {
         throw new Error("Failed to update expense");

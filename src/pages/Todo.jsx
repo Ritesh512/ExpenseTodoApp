@@ -9,6 +9,7 @@ import TodoItemComponent from './TodoItem';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
+import checkAuth from '../api/checkauth';
 
 const animatedComponents = makeAnimated();
 
@@ -34,10 +35,19 @@ const Row = styled.div`
 const ButtonWrapper = styled.div`
   display: flex;
   gap: 20px;
+  width: 100%; /* Ensure full width for both small and large screens */
+  flex-wrap: nowrap; /* Prevent wrapping for both small and large screens */
+
   @media (max-width: 768px) {
-    width: 100%;
-    flex-wrap: wrap;
-    gap: 10px;
+    gap: 10px; /* Adjust gap for smaller screens */
+  }
+`;
+
+const StyledButton = styled(Button)`
+  font-size: 15px; /* Default font size for larger screens */
+
+  @media (max-width: 768px) {
+    font-size: 12px; /* Smaller font size for mobile screens */
   }
 `;
 
@@ -53,8 +63,8 @@ const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -67,9 +77,16 @@ const ModalContainer = styled.div`
   padding: 30px;
   border-radius: 8px;
   width: 400px;
-  max-width: 90%;
+  position: relative;
+  width: 90%;
+  max-width: 500px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   z-index: 1001;
+
+  h2 {
+    margin-bottom: 10px;
+  }
+
   @media (max-width: 768px) {
     width: 80%;
     padding: 20px;
@@ -82,8 +99,8 @@ const CloseButton = styled.button`
   font-size: 24px;
   cursor: pointer;
   position: absolute;
-  top: 5px;
-  right: 10px;
+  top: 10px;
+  right: 20px;
 `;
 
 const TodoWrapper = styled.div`
@@ -92,6 +109,17 @@ const TodoWrapper = styled.div`
   @media (max-width: 768px) {
     margin-top: 20px;
   }
+`;
+
+const Message = styled.h1`
+  font-size: 24px;
+  color: #333;
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
 const Todo = () => {
@@ -113,6 +141,12 @@ const Todo = () => {
           },
         });
 
+        const isAuthValid = await checkAuth(response);
+        if (!isAuthValid) {
+          navigate("/login");
+          return;
+        }
+
         if (!response.ok) {
           const errorData = await response.json();
           if (response.status === 404 && errorData.message === "No todo lists found for the user") {
@@ -128,8 +162,8 @@ const Todo = () => {
           value: list._id,
         }));
         setUserList(options);
-        handleChange(options[0]);
-        navigate(`/todo/${options[0].value}`);
+        // handleChange(options[0]);
+        // navigate(`/todo/${options[0].value}`);
       } catch (error) {
         console.error("Error fetching todo lists:", error);
       }
@@ -147,6 +181,12 @@ const Todo = () => {
           authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
         },
       });
+
+      const isAuthValid = await checkAuth(response);
+      if (!isAuthValid) {
+        navigate("/login");
+        return;
+      }
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -184,6 +224,12 @@ const Todo = () => {
         },
         body: JSON.stringify({ listName }),
       });
+
+      const isAuthValid = await checkAuth(response);
+      if (!isAuthValid) {
+        navigate("/login");
+        return;
+      }
 
       if (!response.ok) {
         throw new Error('Failed to add the list');
@@ -245,9 +291,12 @@ const Todo = () => {
 
       <TodoWrapper>
         {userList.length > 0 ? (
-          <TodoItemComponent userTodo={userTodo} listId={listId} setUserTodo={setUserTodo} />
+          listId !== null ?
+            <TodoItemComponent userTodo={userTodo} listId={listId} setUserTodo={setUserTodo} />
+            :
+            <Message>Please select a list to view tasks</Message>
         ) : (
-          <h1>No List Added</h1>
+          <Message>No List Added</Message>
         )}
       </TodoWrapper>
 

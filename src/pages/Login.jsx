@@ -101,7 +101,7 @@ const Login = () => {
             headers:{'Content-Type': 'application/json'}
         });
         result = await result.json();
-        console.warn(result);
+        // console.warn(result);
         if(result.token){
             localStorage.setItem("user",JSON.stringify(result.loginUser));
             localStorage.setItem("token",JSON.stringify(result.token));

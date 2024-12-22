@@ -1,3 +1,5 @@
+import checkAuth from "./checkauth";
+
 export const getCategoryBreakdown = async (filters) => {
     const { startDate, endDate } = filters;
   
@@ -11,6 +13,11 @@ export const getCategoryBreakdown = async (filters) => {
         },
       }
     );
+
+    const isAuthValid = await checkAuth(response);
+    if (!isAuthValid) {
+        throw new Error("Authentication failed. Redirecting to login...");
+    }
   
     if (!response.ok) {
       throw new Error(`Error fetching category breakdown: ${response.statusText}`);
@@ -33,6 +40,11 @@ export const getCategoryBreakdown = async (filters) => {
       }
     );
   
+    const isAuthValid = await checkAuth(response);
+    if (!isAuthValid) {
+        throw new Error("Authentication failed. Redirecting to login...");
+    }
+
     if (!response.ok) {
       throw new Error(`Error fetching spending trends: ${response.statusText}`);
     }
@@ -54,6 +66,11 @@ export const getCategoryBreakdown = async (filters) => {
       }
     );
   
+    const isAuthValid = await checkAuth(response);
+    if (!isAuthValid) {
+        throw new Error("Authentication failed. Redirecting to login...");
+    }
+
     if (!response.ok) {
       throw new Error(`Error fetching top expenses: ${response.statusText}`);
     }
@@ -75,6 +92,11 @@ export const getCategoryBreakdown = async (filters) => {
         },
       }
     );
+
+    const isAuthValid = await checkAuth(response);
+    if (!isAuthValid) {
+        throw new Error("Authentication failed. Redirecting to login...");
+    }
   
     if (!response.ok) {
       throw new Error(`Error fetching top expenses: ${response.statusText}`);

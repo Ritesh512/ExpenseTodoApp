@@ -10,7 +10,7 @@ const SummaryContainer = styled.div`
   margin-bottom: 40px;
 `;
 
-const SummaryHeader = styled.h3`
+const SummaryHeader = styled.h2`
   color: #1a73e8;  // Dark blue header color
   font-size: 18px;
   margin-bottom: 10px;
@@ -22,6 +22,12 @@ const SummaryItem = styled.div`
   margin: 8px 0;
 `;
 
+const SummaryItemContent = ({ isPositive, children }) => (
+  <div style={{ color: isPositive ? '#28a745' : '#dc3545', fontSize: '16px', margin: '8px 0' }}>
+    {children}
+  </div>
+);
+
 const Summary = ({ summary, month1Name, month2Name }) => {
   const { total1, total2, topExpenseDiff } = summary;
   const { expenseType, amountDiff } = topExpenseDiff;
@@ -29,15 +35,15 @@ const Summary = ({ summary, month1Name, month2Name }) => {
   return (
     <SummaryContainer>
       <SummaryHeader>Comparison Summary: {month1Name} vs {month2Name}</SummaryHeader>
-      <SummaryItem isPositive={total1 > total2}>
+      <SummaryItemContent isPositive={total1 > total2}>
         {month1Name}: ₹{total1.toLocaleString()}
-      </SummaryItem>
-      <SummaryItem isPositive={total2 > total1}>
+      </SummaryItemContent>
+      <SummaryItemContent isPositive={total2 > total1}>
         {month2Name}: ₹{total2.toLocaleString()}
-      </SummaryItem>
-      <SummaryItem isPositive={amountDiff > 0}>
-        Most Expensive Item Difference: {expenseType} (₹{Math.abs(amountDiff).toLocaleString()})
-      </SummaryItem>
+      </SummaryItemContent>
+      <SummaryItemContent isPositive={amountDiff > 0}>
+        {expenseType}: ₹{amountDiff.toLocaleString()}
+      </SummaryItemContent>
     </SummaryContainer>
   );
 };

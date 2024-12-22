@@ -5,7 +5,9 @@ import { FcClock } from "react-icons/fc";
 import { MdEditNote } from "react-icons/md";
 import { Button, TextField } from '@mui/material';
 import { toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css'; 
+import 'react-toastify/dist/ReactToastify.css';
+import checkAuth from '../api/checkauth';
+import { useNavigate } from 'react-router-dom';
 
 // Styled components
 const TodoContainer = styled.div`
@@ -92,12 +94,13 @@ const ButtonContainer = styled.div`
 `;
 
 
-const TodoItemComponent = ({ userTodo,listId,setUserTodo }) => {
+const TodoItemComponent = ({ userTodo, listId, setUserTodo }) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskName, setTaskName] = useState('');
   const [duration, setDuration] = useState(null);
   const [reminder, setReminder] = useState('');
+  const navigate = useNavigate();
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -108,12 +111,12 @@ const TodoItemComponent = ({ userTodo,listId,setUserTodo }) => {
   }
 
   const createTask = async () => {
-    if (taskName && duration) {
-      try { 
-        const reminderInMinutes = reminder 
+    if (taskName && duration && listId) {
+      try {
+        const reminderInMinutes = reminder
           ? reminder
           : null;
-  
+
         const response = await fetch(`http://localhost:3000/api/users/todo/lists/addTask/${listId}`, {
           method: 'POST',
           headers: {
@@ -126,11 +129,17 @@ const TodoItemComponent = ({ userTodo,listId,setUserTodo }) => {
             reminder: reminderInMinutes,
           }),
         });
-  
+
+        const isAuthValid = await checkAuth(response);
+        if (!isAuthValid) {
+          navigate("/login");
+          return;
+        }
+
         if (!response.ok) {
           throw new Error('Failed to create the task');
         }
-  
+
         const result = await response.json();
         console.log(JSON.stringify(result));
         setUserTodo((prevTodos) => [...prevTodos, {
@@ -143,7 +152,7 @@ const TodoItemComponent = ({ userTodo,listId,setUserTodo }) => {
         toast.success("Task created successfully!", {
           position: "top-right",
         });
-        
+
         // Clear the form fields after successful creation
         setTaskName('');
         setDuration('');
@@ -155,12 +164,20 @@ const TodoItemComponent = ({ userTodo,listId,setUserTodo }) => {
         });
       }
     } else {
-      toast.warning("Please fill in the required fields.!", {
-        position: "top-right",
-      });
+      if (!listId) {
+        toast.warning("Please select a list!", {
+          position: "top-right",
+        });
+      }
+      else {
+        toast.warning("Please fill in the required fields.!", {
+          position: "top-right",
+        });
+      }
+
     }
   };
-  
+
 
   const calculateTimeLeft = (targetDate) => {
     if (typeof targetDate === 'string' || targetDate instanceof String) {
@@ -168,22 +185,22 @@ const TodoItemComponent = ({ userTodo,listId,setUserTodo }) => {
     }
     const now = new Date(); // Get the current date and time
     const timeDiffInMilliseconds = targetDate - now; // Difference in milliseconds
-  
+
     if (timeDiffInMilliseconds <= 0) {
       return "0d 0h 0m"; // If the target date has already passed
     }
-  
+
     // Convert milliseconds to minutes
     const timeDiffInMinutes = Math.floor(timeDiffInMilliseconds / 60000);
-    
+
     // Calculate days, hours, and minutes
     const days = Math.floor(timeDiffInMinutes / (24 * 60));
     const hours = Math.floor((timeDiffInMinutes % (24 * 60)) / 60);
     const minutes = timeDiffInMinutes % 60;
     return `${days}d ${hours}h ${minutes}m`; // Return the formatted time left
   };
-  
-  
+
+
   const handleDeleteTask = async (taskId) => {
     try {
       const response = await fetch(`http://localhost:3000/api/users/todo/lists/${listId}/task/${taskId}`, {
@@ -193,6 +210,12 @@ const TodoItemComponent = ({ userTodo,listId,setUserTodo }) => {
           authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
         },
       });
+
+      const isAuthValid = await checkAuth(response);
+      if (!isAuthValid) {
+        navigate("/login");
+        return;
+      }
 
       if (!response.ok) {
         throw new Error('Failed to delete the task');
@@ -219,9 +242,9 @@ const TodoItemComponent = ({ userTodo,listId,setUserTodo }) => {
 
   return (
     <TodoContainer>
-      {userTodo.length > 0 ? userTodo.map((todo,index) => (
+      {userTodo.length > 0 ? userTodo.map((todo, index) => (
         <TodoItem key={todo._id || index}>
-        <Checkbox type="checkbox" onChange={() => handleCheckboxChange(todo._id)} />
+          <Checkbox type="checkbox" onChange={() => handleCheckboxChange(todo._id)} />
           <Title>{todo.taskName}</Title>
           <Reminder>
             <FcClock style={{ marginRight: '5px', fontSize: '24px' }} />
@@ -287,7 +310,7 @@ const TodoItemComponent = ({ userTodo,listId,setUserTodo }) => {
               }}
             />
             <ButtonContainer>
-              <Button variant="contained" onClick={createTask} 
+              <Button variant="contained" onClick={createTask}
                 sx={{ fontSize: '12px', marginTop: '10px' }}>
                 Save Task
               </Button>

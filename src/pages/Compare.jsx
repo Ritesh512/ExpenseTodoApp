@@ -3,6 +3,8 @@ import styled from "styled-components";
 import Chart from "react-apexcharts";
 import Summary from "../ui/Summary";
 import { toast } from 'react-toastify';
+import { useNavigate } from "react-router-dom";
+import checkAuth from "../api/checkauth";
 
 const CompareContainer = styled.div`
   padding: 20px;
@@ -113,6 +115,7 @@ const Compare = () => {
   const [year2, setYear2] = useState(String(currentYear));
   const [chartData1, setChartData1] = useState([]);
   const [chartData2, setChartData2] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
@@ -130,7 +133,11 @@ const Compare = () => {
           },
         }
       );
-
+      const isAuthValid = await checkAuth(response);
+        if (!isAuthValid) {
+            navigate("/login");
+            return;
+        }
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }

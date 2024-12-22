@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import ProfileChart from "../ui/ProfileChart";
+import checkAuth from "../api/checkauth";
+import { useNavigate } from "react-router-dom";
 
 // Styled Components
 const DashboardContainer = styled.div`
@@ -125,46 +127,70 @@ const Dashboard = () => {
   const [expense, setExpense] = useState({ barChartData: [], pieChartData: [] });
 
   const user = JSON.parse(localStorage.getItem('user'));
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch User Profile
-    fetch(`http://localhost:3000/api/users/profile/${user.userId}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
-        },
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => setProfile(data));
+    const fetchData = async () => {
+      try {
+        // Fetch User Profile
+        const profileRes = await fetch(`http://localhost:3000/api/users/profile/${user.userId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
+          },
+        });
 
-    // Fetch To-Do Data
-    fetch("http://localhost:3000/api/users/todo/lists/summary",
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
-        },
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => setTodo(data));
+        const isAuthValid = await checkAuth(profileRes);
+        if (!isAuthValid) {
+          navigate("/login");
+          return;
+        }
 
-    // Fetch Expense Data
-    fetch("http://localhost:3000/api/expenses/dashboard/report",
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
-        },
+        const profileData = await profileRes.json();
+        setProfile(profileData);
+
+        // Fetch To-Do Data
+        const todoRes = await fetch("http://localhost:3000/api/users/todo/lists/summary", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
+          },
+        });
+
+        const isTodoAuthValid = await checkAuth(todoRes);
+        if (!isTodoAuthValid) {
+          navigate("/login");
+          return;
+        }
+
+        const todoData = await todoRes.json();
+        setTodo(todoData);
+
+        // Fetch Expense Data
+        const expenseRes = await fetch("http://localhost:3000/api/expenses/dashboard/report", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
+          },
+        });
+
+        const isExpenseAuthValid = await checkAuth(expenseRes);
+        if (!isExpenseAuthValid) {
+          navigate("/login");
+          return;
+        }
+
+        const expenseData = await expenseRes.json();
+        setExpense(expenseData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-    )
-      .then((res) => res.json())
-      .then((data) => {setExpense(data);console.log(data)});
+    };
+
+    fetchData();
   }, []);
 
   return (
@@ -205,8 +231,8 @@ const Dashboard = () => {
       <ExpenseSection>
         <h2>Expense Report</h2>
         <div className="chart-container">
-          <ProfileChart title="Expense Bar Chart" data={expense?.barChartData|| []} type="bar" />
-          <ProfileChart title="Expense Donut Chart" data={expense?.pieChartData|| []} type="donut" />
+          <ProfileChart title="Expense Bar Chart" data={expense?.barChartData || []} type="bar" />
+          <ProfileChart title="Expense Donut Chart" data={expense?.pieChartData || []} type="donut" />
         </div>
       </ExpenseSection>
     </DashboardContainer>

@@ -57,7 +57,7 @@ function App() {
         </Routes>
       </BrowserRouter>
 
-      <ToastContainer />
+      <ToastContainer className="toast-container" />
     </>
   )
 }

@@ -1,0 +1,18 @@
+.toast-container {
+    font-size: 16px; /* Default font size for larger screens */
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    width: auto; /* Default width */
+  }
+  
+  @media (max-width: 500px) {
+    .toast-container {
+      font-size: 12px; /* Smaller font size for mobile screens */
+      max-width: 90%; /* Adjust width for smaller screens */
+      width: 50%; /* Reduce width for smaller screens */
+      right: 1rem;
+      margin-left: 50%;
+    }
+  }

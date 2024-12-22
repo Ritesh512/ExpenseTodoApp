@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import checkAuth from '../api/checkauth';
 
 // Styled components
 const PageContainer = styled.div`
@@ -110,6 +111,12 @@ const ViewExpense = () => {
         }
       );
 
+      const isAuthValid = await checkAuth(response);
+      if (!isAuthValid) {
+        navigate("/login");
+        return;
+      }
+
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
@@ -134,6 +141,12 @@ const ViewExpense = () => {
           authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
         },
       });
+
+      const isAuthValid = await checkAuth(response);
+      if (!isAuthValid) {
+        navigate("/login");
+        return;
+      }
 
       if (response.ok) {
         toast.success("Expense Deleted!", {

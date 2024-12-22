@@ -2,6 +2,7 @@ import React from 'react';
 import ExpenseForm from '../ui/ExpenseForm';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import checkAuth from '../api/checkauth';
 
 
 const AddExpense = () => {
@@ -19,6 +20,12 @@ const AddExpense = () => {
         },
         body: JSON.stringify(expenseData),
       });
+
+      const isAuthValid = await checkAuth(response);
+      if (!isAuthValid) {
+        navigate("/login");
+        return;
+      }
 
       if (!response.ok) {
         throw new Error("Failed to add expense");

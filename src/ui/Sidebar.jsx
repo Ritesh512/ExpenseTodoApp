@@ -25,7 +25,7 @@ const StyledSidebar = styled.aside`
   }
 
   /* For mobile screens */
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     position: fixed;
     bottom: 0;
     width: 100%;
