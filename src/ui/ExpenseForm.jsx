@@ -84,79 +84,88 @@ const Button = styled.button`
 `;
 
 const ExpenseForm = ({ initialData = {}, onSubmit, submitButtonText }) => {
-    const [expenseName, setExpenseName] = useState(initialData.expenseName || '');
-    const [expenseType, setExpenseType] = useState(initialData.expenseType || '');
-    const [date, setDate] = useState(initialData.date || '');
-    const [issuedTo, setIssuedTo] = useState(initialData.issuedTo || '');
-    const [amount, setAmount] = useState(initialData.amount || '');
+  const [expenseName, setExpenseName] = useState(initialData.expenseName || '');
+  const [expenseType, setExpenseType] = useState(initialData.expenseType || '');
+  const [date, setDate] = useState(initialData.date || '');
+  const [issuedTo, setIssuedTo] = useState(initialData.issuedTo || '');
+  const [amount, setAmount] = useState(initialData.amount || '');
 
-    useEffect(() => {
-        if (initialData._id) {
-            setExpenseName(initialData.expenseName);
-            setExpenseType(initialData.expenseType);
-            setDate(initialData.date);
-            setIssuedTo(initialData.issuedTo);
-            setAmount(initialData.amount);
-        }
-    }, [initialData]);
+  useEffect(() => {
+    if (initialData._id) {
+      setExpenseName(initialData.expenseName);
+      setExpenseType(initialData.expenseType);
+      setDate(initialData.date);
+      setIssuedTo(initialData.issuedTo);
+      setAmount(initialData.amount);
+    }
+  }, [initialData]);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const expenseData = {
-            expenseName,
-            expenseType,
-            date,
-            issuedTo,
-            amount,
-        };
-        onSubmit(expenseData);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formattedType =
+      expenseType.charAt(0).toUpperCase() + expenseType.slice(1).toLowerCase();
+
+    const expenseData = {
+      expenseName,
+      expenseType: formattedType,
+      date,
+      issuedTo,
+      amount,
     };
+    onSubmit(expenseData);
+  };
 
-    return (
-        <FormContainer>
-            <form onSubmit={handleSubmit}>
-                <Input
-                    type="text"
-                    placeholder="Expense Name"
-                    value={expenseName}
-                    onChange={(e) => setExpenseName(e.target.value)}
-                />
-                <Select
-                    value={expenseType}
-                    onChange={(e) => setExpenseType(e.target.value)}
-                >
-                    {/* Dropdown options */}
-                    <option value="Retail">Retail</option>
-                    <option value="Electronic">Electronic</option>
-                    <option value="Food">Food</option>
-                    <option value="Travel">Travel</option>
-                    <option value="Utilities">Utilities</option>
-                    <option value="Gold">Gold</option>
-                    <option value="SIP">SIP</option>
-                    <option value="Medicine">Medicine</option>
-                    <option value="Other">Other</option>
-                </Select>
-                <Input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                />
-                <Input
-                    type="text"
-                    placeholder="Issued To"
-                    value={issuedTo}
-                    onChange={(e) => setIssuedTo(e.target.value)}
-                />
-                <Input
-                    type="number"
-                    placeholder="Amount"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                />
-                <Button type="submit">{submitButtonText}</Button>
-            </form>
-        </FormContainer>
-    );
+  return (
+    <FormContainer>
+      <form onSubmit={handleSubmit}>
+        <Input
+          type="text"
+          placeholder="Expense Name"
+          value={expenseName}
+          onChange={(e) => setExpenseName(e.target.value)}
+        />
+
+        {/* Expense Type input with suggestions */}
+        <Input
+          type="text"
+          list="expense-types"
+          placeholder="Expense Type (e.g. Food, Travel, Custom)"
+          value={expenseType}
+          onChange={(e) => setExpenseType(e.target.value)}
+        />
+        <datalist id="expense-types">
+          <option value="Retail" />
+          <option value="Electronic" />
+          <option value="Food" />
+          <option value="Travel" />
+          <option value="Utilities" />
+          <option value="Gold" />
+          <option value="SIP" />
+          <option value="Medicine" />
+          <option value="Other" />
+        </datalist>
+
+        <Input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
+        <Input
+          type="text"
+          placeholder="Issued To"
+          value={issuedTo}
+          onChange={(e) => setIssuedTo(e.target.value)}
+        />
+        <Input
+          type="number"
+          placeholder="Amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+        <Button type="submit">{submitButtonText}</Button>
+      </form>
+    </FormContainer>
+  );
 };
 
 export default ExpenseForm;
