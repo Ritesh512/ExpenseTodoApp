@@ -83,9 +83,13 @@ const Button = styled.button`
   }
 `;
 
+const predefinedTypes = ["Retail", "Electronic", "Food", "Travel", "Utilities", "Gold", "SIP", "Medicine"];
+
+
 const ExpenseForm = ({ initialData = {}, onSubmit, submitButtonText }) => {
   const [expenseName, setExpenseName] = useState(initialData.expenseName || '');
   const [expenseType, setExpenseType] = useState(initialData.expenseType || '');
+  const [customExpenseType, setCustomExpenseType] = useState('');
   const [date, setDate] = useState(initialData.date || '');
   const [issuedTo, setIssuedTo] = useState(initialData.issuedTo || '');
   const [amount, setAmount] = useState(initialData.amount || '');
@@ -93,7 +97,13 @@ const ExpenseForm = ({ initialData = {}, onSubmit, submitButtonText }) => {
   useEffect(() => {
     if (initialData._id) {
       setExpenseName(initialData.expenseName);
-      setExpenseType(initialData.expenseType);
+      // if the initial expenseType is not one of predefined types, treat it as custom
+      if (initialData.expenseType && !predefinedTypes.includes(initialData.expenseType)) {
+        setExpenseType('Other');
+        setCustomExpenseType(initialData.expenseType);
+      } else {
+        setExpenseType(initialData.expenseType || 'Retail');
+      }
       setDate(initialData.date);
       setIssuedTo(initialData.issuedTo);
       setAmount(initialData.amount);
@@ -102,8 +112,14 @@ const ExpenseForm = ({ initialData = {}, onSubmit, submitButtonText }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formattedType =
-      expenseType.charAt(0).toUpperCase() + expenseType.slice(1).toLowerCase();
+    const rawType = expenseType === 'Other'
+      ? (customExpenseType || 'Other')
+      : expenseType;
+
+    const normalized = String(rawType).trim();
+    const formattedType = normalized
+      ? normalized.charAt(0).toUpperCase() + normalized.slice(1)
+      : 'Other';
 
     const expenseData = {
       expenseName,
@@ -125,13 +141,26 @@ const ExpenseForm = ({ initialData = {}, onSubmit, submitButtonText }) => {
           onChange={(e) => setExpenseName(e.target.value)}
         />
 
-        {/* Expense Type input with suggestions */}
+        {/* Expense Type input with suggestions (typeable) + optional custom input when 'Other' selected */}
         <Input
           type="text"
           list="expense-types"
           placeholder="Expense Type (e.g. Food, Travel, Custom)"
-          value={expenseType}
-          onChange={(e) => setExpenseType(e.target.value)}
+          value={expenseType === 'Other' && customExpenseType ? customExpenseType : expenseType}
+          onChange={(e) => {
+            const v = e.target.value;
+            if (v === 'Other') {
+              setExpenseType('Other');
+              setCustomExpenseType('');
+            } else if (predefinedTypes.includes(v)) {
+              setExpenseType(v);
+              setCustomExpenseType('');
+            } else {
+              // treat as typed/custom value
+              setExpenseType(v);
+              setCustomExpenseType(v);
+            }
+          }}
         />
         <datalist id="expense-types">
           <option value="Retail" />
@@ -144,6 +173,8 @@ const ExpenseForm = ({ initialData = {}, onSubmit, submitButtonText }) => {
           <option value="Medicine" />
           <option value="Other" />
         </datalist>
+
+        {/* Note: single typeable input above handles both selecting and typing custom values. */}
 
         <Input
           type="date"
