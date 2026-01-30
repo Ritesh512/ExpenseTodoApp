@@ -6,6 +6,8 @@ import {
 import { FcTodoList } from "react-icons/fc";
 import { GiReceiveMoney } from "react-icons/gi";
 import { LiaBirthdayCakeSolid } from "react-icons/lia";
+import { MdStickyNote2 } from "react-icons/md";
+
 
 // Styling the NavList
 const NavList = styled.ul`

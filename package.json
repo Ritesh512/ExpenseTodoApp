@@ -17,8 +17,10 @@
     "@mui/x-charts": "^7.22.2",
     "apexcharts": "^3.54.1",
     "chart.js": "^4.4.6",
+    "file-saver": "^2.0.5",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
+    "jspdf-autotable": "^5.0.7",
     "react": "^18.3.1",
     "react-apexcharts": "^1.5.0",
     "react-chartjs-2": "^5.2.0",
@@ -29,7 +31,8 @@
     "react-router-dom": "^6.27.0",
     "react-select": "^5.8.1",
     "react-toastify": "^10.0.6",
-    "styled-components": "^6.1.13"
+    "styled-components": "^6.1.13",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",

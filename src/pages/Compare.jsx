@@ -195,32 +195,50 @@ const Compare = () => {
     const total1 = chartData1.reduce((sum, item) => sum + item.amount, 0);
     const total2 = chartData2.reduce((sum, item) => sum + item.amount, 0);
 
-    const differences = [
+    // Calculate category differences
+    const categoryDifferences = [
       ...chartData1.map((item) => {
         const match = chartData2.find((data) => data.expenseType === item.expenseType);
         return {
           expenseType: item.expenseType,
-          amountDiff: match ? match.amount - item.amount : -item.amount,
+          amount1: item.amount,
+          amount2: match ? match.amount : 0,
+          difference: match ? match.amount - item.amount : -item.amount,
         };
       }),
       ...chartData2
         .filter((item) => !chartData1.find((data) => data.expenseType === item.expenseType))
         .map((item) => ({
           expenseType: item.expenseType,
-          amountDiff: item.amount,
+          amount1: 0,
+          amount2: item.amount,
+          difference: item.amount,
         })),
-    ];
+    ].sort((a, b) => Math.abs(b.difference) - Math.abs(a.difference)); // Sort by absolute difference
 
-    const topExpenseDiff = differences.reduce(
-      (prev, curr) =>
-        Math.abs(curr.amountDiff) > Math.abs(prev.amountDiff) ? curr : prev,
-      { expenseType: "None", amountDiff: 0 }
-    );
+    const topExpenseDiff = categoryDifferences.length > 0 ? categoryDifferences[0] : {
+      expenseType: "None",
+      difference: 0,
+      amount1: 0,
+      amount2: 0
+    };
+
+    // Calculate additional metrics
+    const categoryCount1 = chartData1.length;
+    const categoryCount2 = chartData2.length;
 
     return {
       total1,
       total2,
-      topExpenseDiff,
+      topExpenseDiff: {
+        expenseType: topExpenseDiff.expenseType,
+        amountDiff: topExpenseDiff.difference,
+        amount1: topExpenseDiff.amount1,
+        amount2: topExpenseDiff.amount2
+      },
+      categoryDifferences: categoryDifferences.slice(0, 5), // Top 5 category differences
+      categoryCount1,
+      categoryCount2,
     };
   };
 
@@ -296,7 +314,7 @@ const Compare = () => {
       <ChartContainer>
         <Card>
           <div>
-            <ChartTitle>{month1.name}</ChartTitle>
+            <ChartTitle>{month1.name} {year1}</ChartTitle>
             {
               chartData1.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "20px", color: "#888" }}>
@@ -315,7 +333,7 @@ const Compare = () => {
         </Card>
         <Card>
           <div>
-            <ChartTitle>{month2.name}</ChartTitle>
+            <ChartTitle>{month2.name} {year2}</ChartTitle>
             {
               chartData2.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "20px", color: "#888" }}>
@@ -335,7 +353,7 @@ const Compare = () => {
       </ChartContainer>
 
       {
-        chartData2.length > 0 && <Summary summary={computeSummary()} month1Name={month1.name} month2Name={month2.name} />
+        chartData2.length > 0 && <Summary summary={computeSummary()} month1Name={month1.name} month2Name={month2.name} year1={year1} year2={year2} />
       }
 
     </CompareContainer>
