@@ -115,11 +115,22 @@ const Compare = () => {
   const [year2, setYear2] = useState(String(currentYear));
   const [chartData1, setChartData1] = useState([]);
   const [chartData2, setChartData2] = useState([]);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
   }, [month1, year1, month2, year2]);
+
+  // Handle window resize for responsive charts
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -165,6 +176,12 @@ const Compare = () => {
     labels: [],
     dataLabels: {
       enabled: true,
+      style: {
+        fontSize: '12px',
+      },
+      dropShadow: {
+        enabled: false,
+      },
     },
     colors: [
       "#00E396", // Green
@@ -178,17 +195,74 @@ const Compare = () => {
     ],
     legend: {
       position: "bottom",
+      fontSize: '12px',
+      markers: {
+        width: 8,
+        height: 8,
+      },
+      itemMargin: {
+        horizontal: 8,
+        vertical: 4,
+      },
     },
     plotOptions: {
       pie: {
         donut: {
           size: "75%",
-          gradient: {
-            enabled: true,
+          labels: {
+            show: false, // Hide center labels to save space
           },
         },
       },
     },
+    responsive: [
+      {
+        breakpoint: 768, // Tablet breakpoint
+        options: {
+          legend: {
+            position: "bottom",
+            fontSize: '11px',
+            itemMargin: {
+              horizontal: 6,
+              vertical: 3,
+            },
+          },
+          dataLabels: {
+            enabled: false, // Disable data labels on tablet to prevent overflow
+          },
+          plotOptions: {
+            pie: {
+              donut: {
+                size: "70%", // Slightly smaller donut
+              },
+            },
+          },
+        },
+      },
+      {
+        breakpoint: 480, // Mobile breakpoint
+        options: {
+          legend: {
+            position: "bottom",
+            fontSize: '10px',
+            itemMargin: {
+              horizontal: 4,
+              vertical: 2,
+            },
+          },
+          dataLabels: {
+            enabled: false, // Disable data labels on mobile
+          },
+          plotOptions: {
+            pie: {
+              donut: {
+                size: "65%", // Smaller donut for mobile
+              },
+            },
+          },
+        },
+      },
+    ],
   };
 
   const computeSummary = () => {
@@ -325,7 +399,8 @@ const Compare = () => {
                   options={{ ...chartOptions, labels: prepareChartData(chartData1).labels }}
                   series={prepareChartData(chartData1).series}
                   type="donut"
-                  width="400"
+                  width={windowWidth < 768 ? "100%" : "400"}
+                  height={windowWidth < 768 ? "300" : "400"}
                 />
               )
             }
@@ -344,7 +419,8 @@ const Compare = () => {
                   options={{ ...chartOptions, labels: prepareChartData(chartData2).labels }}
                   series={prepareChartData(chartData2).series}
                   type="donut"
-                  width="400"
+                  width={windowWidth < 768 ? "100%" : "400"}
+                  height={windowWidth < 768 ? "300" : "400"}
                 />
               )
             }
