@@ -277,7 +277,7 @@ const AnalysisPage = () => {
 
         // Fetch daily data and group by weeks
         const trendData = await getSpendingTrends({ ...filters, interval: 'daily' });
-        
+
         // Group daily data by weeks within the selected month
         const weeklyData = {};
         trendData.spendingTrends.forEach((entry) => {
@@ -285,11 +285,11 @@ const AnalysisPage = () => {
           const year = date.getFullYear();
           const month = date.getMonth();
           const day = date.getDate();
-          
+
           // Calculate week number within the month (1-5)
           const weekNum = Math.ceil(day / 7);
           const weekKey = `${year}-${month}-${weekNum}`;
-          
+
           if (!weeklyData[weekKey]) {
             weeklyData[weekKey] = {
               weekNum,
@@ -298,15 +298,15 @@ const AnalysisPage = () => {
               count: 0
             };
           }
-          
+
           weeklyData[weekKey].total += Number(entry.amount) || 0;
           weeklyData[weekKey].count += 1;
         });
-        
+
         // Convert to arrays for chart
         const xData = Object.values(weeklyData).map(week => `Week ${week.weekNum} (${week.month})`);
         const yData = Object.values(weeklyData).map(week => Number(week.total) || 0);
-        
+
         setSpendingTrends({ xData, yData });
 
         const topExpensesData = await getTopExpenses(filters);
@@ -415,8 +415,8 @@ const AnalysisPage = () => {
           {spendingTrends && spendingTrends.xData?.length && spendingTrends.yData?.length ? (
             <div style={{ width: '100%', height: windowWidth < 768 ? '250px' : '300px' }}>
               <LineChart
-                xAxis={[{ 
-                  data: spendingTrends.xData, 
+                xAxis={[{
+                  data: spendingTrends.xData,
                   scaleType: 'band',
                   tickLabelStyle: {
                     fontSize: windowWidth < 768 ? 10 : 12,
@@ -427,7 +427,7 @@ const AnalysisPage = () => {
                 yAxis={[{
                   valueFormatter: (value) => `₹${Number(value).toLocaleString('en-IN')}`
                 }]}
-                series={[{ 
+                series={[{
                   data: spendingTrends.yData.map(val => Number(val) || 0),
                   valueFormatter: (value) => `₹${Number(value).toLocaleString('en-IN')}`
                 }]}

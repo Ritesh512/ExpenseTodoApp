@@ -90,7 +90,12 @@ const ExpenseForm = ({ initialData = {}, onSubmit, submitButtonText }) => {
   const [expenseName, setExpenseName] = useState(initialData.expenseName || '');
   const [expenseType, setExpenseType] = useState(initialData.expenseType || '');
   const [customExpenseType, setCustomExpenseType] = useState('');
-  const [date, setDate] = useState(initialData.date || '');
+  // Default to today's date in YYYY-MM-DD format
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+  const [date, setDate] = useState(initialData.date || getTodayDate());
   const [issuedTo, setIssuedTo] = useState(initialData.issuedTo || '');
   const [amount, setAmount] = useState(initialData.amount || '');
 

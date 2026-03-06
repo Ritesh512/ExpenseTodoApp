@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
+import { FaPlus, FaEye, FaExchangeAlt, FaChartBar, FaRobot } from 'react-icons/fa';
 
 // Styled components for the Navbar
 const NavbarContainer = styled.nav`
@@ -33,6 +34,9 @@ const StyledNavLink = styled(NavLink)`
   padding: 10px 20px;
   border-radius: 8px;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
   &.active {
     background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent active tab */
@@ -49,16 +53,24 @@ const StyledNavLink = styled(NavLink)`
     font-size: 16px; /* Slightly smaller font on smaller screens */
     padding: 8px 15px; /* Adjust padding for better spacing */
     margin: 0 8px; /* Reduce margin for better fit on small screens */
+    gap: 6px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 14px;
+    padding: 6px 12px;
+    margin: 0 4px;
   }
 `;
 
 const ExpenseNavbar = () => {
   return (
     <NavbarContainer>
-      <StyledNavLink to="add-expense">Add Expense</StyledNavLink>
-      <StyledNavLink to="view-expense">View Expense</StyledNavLink>
-      <StyledNavLink to="compare">Compare</StyledNavLink>
-      <StyledNavLink to="analysis">Analysis</StyledNavLink>
+      <StyledNavLink to="add-expense"><FaPlus /> Add Expense</StyledNavLink>
+      <StyledNavLink to="view-expense"><FaEye /> View Expense</StyledNavLink>
+      <StyledNavLink to="compare"><FaExchangeAlt /> Compare</StyledNavLink>
+      <StyledNavLink to="analysis"><FaChartBar /> Analysis</StyledNavLink>
+      <StyledNavLink to="ai-insights"><FaRobot /> AI Insights</StyledNavLink>
     </NavbarContainer>
   );
 };

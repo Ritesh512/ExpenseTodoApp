@@ -16,6 +16,7 @@ import AddExpense from './pages/AddExpense';
 import ViewExpense from './pages/ViewExpense';
 import Compare from './pages/Compare';
 import AnalysisPage from './pages/AnalysisPage';
+import AIInsightsPage from './pages/AIInsightsPage';
 import EditExpense from './pages/EditExpense';
 
 import { ToastContainer, toast } from "react-toastify";
@@ -36,7 +37,7 @@ function App() {
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="todo/:listId" element={<Todo />} />
               <Route path="todo/edit-list-name" element={<EditListName />} />
-              
+
               <Route path="expenses" element={<Expenses />} >
                 <Route index element={<Navigate to="view-expense" replace />} />
                 <Route path="add-expense" element={<AddExpense />} />
@@ -44,6 +45,7 @@ function App() {
                 <Route path="/expenses/edit/:id" element={<EditExpense />} />
                 <Route path="compare" element={<Compare />} />
                 <Route path="analysis" element={<AnalysisPage />} />
+                <Route path="ai-insights" element={<AIInsightsPage />} />
               </Route>
 
               <Route path="birthday" element={<Birthday />} />

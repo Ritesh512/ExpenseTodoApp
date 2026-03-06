@@ -156,6 +156,32 @@ const ExportButton = styled.button`
   }
 `;
 
+// styled component for showing total amount above the list
+const TotalAmount = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin: 15px 0;
+`;
+
+const TotalCard = styled.div`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  padding: 12px 22px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  font-weight: 700;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.6);
+    transform: translateY(-3px);
+  }
+`;
+
 
 /* ================= COMPONENT ================= */
 
@@ -262,6 +288,14 @@ const ViewExpense = () => {
     return matchesSearch && matchesCategory;
   });
 
+  // calculate total amount for displayed (filtered) expenses
+  const totalAmount = filteredExpenses.reduce(
+    (sum, e) => sum + (parseFloat(e.amount) || 0),
+    0
+  );
+
+  const totalLabel = selectedCategory ? `Total for ${selectedCategory}:` : "Total:";
+
   const totalPages = Math.ceil(filteredExpenses.length / ITEMS_PER_PAGE);
 
   const paginatedExpenses = filteredExpenses
@@ -352,6 +386,12 @@ const ViewExpense = () => {
 
         {error && <ErrorMessage>{error}</ErrorMessage>}
 
+        {/* total of current filtered expenses */}
+        <TotalAmount>
+          <TotalCard>
+            {totalLabel} ₹{totalAmount.toFixed(2)}
+          </TotalCard>
+        </TotalAmount>
         <ExpenseList>
           {paginatedExpenses.length > 0 ? (
             paginatedExpenses.map((expense) => (
