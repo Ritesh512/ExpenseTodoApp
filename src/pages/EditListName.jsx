@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { FaTrashAlt } from 'react-icons/fa';
+import { FaTrashAlt, FaArrowLeft } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';
 import { toast } from "react-toastify";
+import { useNavigate } from 'react-router-dom';
+import checkAuth from '../api/checkauth';
 
 // Styled components
 const Container = styled.div`
@@ -17,13 +19,29 @@ const Container = styled.div`
   overflow-y: auto; /* Scrollable if content overflows */
 `;
 
-const Heading = styled.h2`
-  top: 20px; 
-  background-color: #fff; /* Match container background */
-  margin: 0 0 20px; /* Remove top margin and add bottom margin */
-  padding: 10px 0; /* Add padding for better spacing */
-  text-align: center;
+// const Heading = styled.h2`
+//   top: 20px; 
+//   background-color: #fff; /* Match container background */
+//   margin: 0 0 20px; /* Remove top margin and add bottom margin */
+//   padding: 10px 0; /* Add padding for better spacing */
+//   text-align: center;
+//   color: #333;
+// `;
+
+const Heading = styled.h1`
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+  padding: 10px;
+  justify-content: flex-start;
+  gap:20px;
+  background-color: #fff;
   color: #333;
+`;
+
+const BackIcon = styled(FaArrowLeft)`
+  margin-right: 10px;
+  cursor: pointer;
 `;
 
 const ListContainer = styled.div`
@@ -58,7 +76,12 @@ const DeleteButton = styled.button`
 const EditListName = () => {
   const { state } = useLocation();
   const [listNames, setListNames] = useState(state?.userList || []);
-  console.log(listNames, state);
+
+  const navigate = useNavigate();
+
+  const handleBackClick = () => {
+    navigate(-1); 
+  };
 
   const handleDelete = async (listId) => {
     try {
@@ -69,6 +92,12 @@ const EditListName = () => {
           authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
         }
       });
+
+      const isAuthValid = await checkAuth(response);
+        if (!isAuthValid) {
+            navigate("/login");
+            return;
+        }
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -94,16 +123,23 @@ const EditListName = () => {
 
   return (
     <>
-      <Heading>Edit List Names</Heading> {/* Added heading */}
+      <Heading>
+        <BackIcon onClick={handleBackClick} />
+        Edit List Names
+      </Heading>
       <Container>
-        {listNames.map((list, index) => (
-          <ListContainer key={index}>
-            <ListItem>{list.label}</ListItem>
-            <DeleteButton onClick={() => handleDelete(list.value)}>
-              <FaTrashAlt />
-            </DeleteButton>
-          </ListContainer>
-        ))}
+        {listNames.length > 0 ?
+          listNames.map((list, index) => (
+            <ListContainer key={index}>
+              <ListItem>{list.label}</ListItem>
+              <DeleteButton onClick={() => handleDelete(list.value)}>
+                <FaTrashAlt />
+              </DeleteButton>
+            </ListContainer>
+          ))
+          :
+          <h1>No List Added Yet!</h1>
+        }
       </Container>
     </>
   );

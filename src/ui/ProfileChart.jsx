@@ -3,90 +3,131 @@ import styled from 'styled-components';
 import Chart from 'react-apexcharts';
 
 const Card = styled.div`
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  background: var(--color-grey-0);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+    max-width: 100%;
+  }
 `;
 
 const Title = styled.h4`
-  font-size: 18px;
-  margin-bottom: 10px;
-`;
-
-const FallbackMessage = styled.div`
-  text-align: center;
-  color: #888;
-  padding: 20px;
-  font-size: 16px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: var(--color-grey-900);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 `;
 
 const ProfileChart = ({ title, data = [], type }) => {
+  // Determine current theme from document attribute
+  const isDarkMode = document.documentElement.getAttribute("data-theme") === "dark";
+
   const transformData = () => {
-    if (!data.length) return null; // Handle empty data
+    if (!data.length) return null;
+
+    const commonOptions = {
+      theme: {
+        mode: isDarkMode ? 'dark' : 'light',
+        palette: 'palette1'
+      },
+      chart: {
+        background: 'transparent',
+        fontFamily: 'Poppins, sans-serif',
+        toolbar: { show: false }
+      },
+      colors: ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b', '#10b981', '#06b6d4'],
+      stroke: {
+        show: true,
+        width: 2,
+        colors: [isDarkMode ? 'var(--color-grey-0)' : '#fff']
+      },
+      grid: {
+        borderColor: 'var(--glass-border)',
+        strokeDashArray: 4,
+      },
+      tooltip: {
+        theme: isDarkMode ? 'dark' : 'light',
+      }
+    };
 
     if (type === 'donut') {
-      // Pie Chart (Donut)
       return {
         options: {
+          ...commonOptions,
           labels: data.map((item) => item.category),
           plotOptions: {
             pie: {
               donut: {
-                size: '70%',
+                size: '75%',
+                labels: {
+                  show: true,
+                  total: {
+                    show: true,
+                    label: 'Total',
+                    color: 'var(--color-grey-600)',
+                    formatter: (w) => {
+                      const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                      return `₹${total.toLocaleString()}`;
+                    }
+                  }
+                }
               },
             },
           },
+          dataLabels: { enabled: false },
+          legend: {
+            position: 'bottom',
+            fontSize: '12px',
+            labels: { colors: 'var(--color-grey-600)' }
+          }
         },
-        series: data.map((item) => parseFloat(item.percentage)),
+        series: data.map((item) => parseFloat(item.amount || item.percentage)),
       };
-    }
-
-    if (type === 'bar') {
-      // Bar Chart
-      const seriesData = data.map((item) => item.amount);
+    } else if (type === 'bar') {
       return {
         options: {
-          chart: {
-            type: 'bar',
-            height: 350,
-          },
+          ...commonOptions,
           xaxis: {
-            categories: data.map((item) => item.category),
-            title: {
-              text: 'Categories',
-            },
+            categories: data.map((item) => item.month || item.category),
+            labels: { style: { colors: 'var(--color-grey-500)' } }
           },
           yaxis: {
-            title: {
-              text: 'Amount ($)',
-            },
+            labels: { 
+              style: { colors: 'var(--color-grey-500)' },
+              formatter: (val) => val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val
+            }
           },
-          title: {
-            text: 'Spending by Category',
-            align: 'center',
-            style: {
-              fontSize: '18px',
-              fontWeight: 'bold',
-              color: '#333',
-            },
+          plotOptions: {
+            bar: {
+              borderRadius: 6,
+              columnWidth: '45%',
+            }
           },
+          dataLabels: { enabled: false }
         },
         series: [
           {
             name: 'Amount',
-            data: seriesData,
+            data: data.map((item) => item.total || item.amount),
           },
         ],
       };
     }
-
-    return {
-      options: {},
-      series: [],
-    };
   };
 
   const chartData = transformData();
@@ -95,9 +136,17 @@ const ProfileChart = ({ title, data = [], type }) => {
     <Card>
       <Title>{title}</Title>
       {chartData ? (
-        <Chart options={chartData.options} series={chartData.series} type={type} width="100%" />
+        <Chart 
+          options={chartData.options} 
+          series={chartData.series} 
+          type={type} 
+          width="100%" 
+          height={280}
+        />
       ) : (
-        <FallbackMessage>No data available</FallbackMessage>
+        <div style={{ textAlign: 'center', color: 'var(--color-grey-400)', padding: '40px' }}>
+          No data available
+        </div>
       )}
     </Card>
   );

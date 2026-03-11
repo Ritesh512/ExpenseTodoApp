@@ -10,12 +10,14 @@ import Todo from "./pages/Todo";
 import Expenses from "./pages/Expenses";
 import Birthday from "./pages/Birthday";
 import EditListName from "./pages/EditListName";
+import React, { useState, useEffect } from "react";
 
 
 import AddExpense from './pages/AddExpense';
 import ViewExpense from './pages/ViewExpense';
 import Compare from './pages/Compare';
 import AnalysisPage from './pages/AnalysisPage';
+import AIInsightsPage from './pages/AIInsightsPage';
 import EditExpense from './pages/EditExpense';
 
 import { ToastContainer, toast } from "react-toastify";
@@ -24,6 +26,18 @@ import "react-toastify/dist/ReactToastify.css";
 import './App.css'
 
 function App() {
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "dark";
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
 
   return (
     <>
@@ -31,12 +45,12 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<Private />}>
-            <Route element={<AppLayout />}>
+            <Route element={<AppLayout theme={theme} toggleTheme={toggleTheme} />}>
               <Route index element={<Navigate replace to="dashboard" />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="todo/:listId" element={<Todo />} />
               <Route path="todo/edit-list-name" element={<EditListName />} />
-              
+
               <Route path="expenses" element={<Expenses />} >
                 <Route index element={<Navigate to="view-expense" replace />} />
                 <Route path="add-expense" element={<AddExpense />} />
@@ -44,10 +58,10 @@ function App() {
                 <Route path="/expenses/edit/:id" element={<EditExpense />} />
                 <Route path="compare" element={<Compare />} />
                 <Route path="analysis" element={<AnalysisPage />} />
+                <Route path="ai-insights" element={<AIInsightsPage />} />
               </Route>
 
               <Route path="birthday" element={<Birthday />} />
-              {/* <Route path="settings" element={<Settings />} /> */}
             </Route>
           </Route>
 
@@ -57,7 +71,7 @@ function App() {
         </Routes>
       </BrowserRouter>
 
-      <ToastContainer />
+      <ToastContainer className="toast-container" />
     </>
   )
 }

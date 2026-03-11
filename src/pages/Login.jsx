@@ -95,31 +95,37 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Login clicked!");
-    let result = await fetch("http://localhost:3000/api/users/login",{
-            method:"post",
-            body:JSON.stringify({email,password}),
-            headers:{'Content-Type': 'application/json'}
+    try {
+      let result = await fetch("http://localhost:3000/api/users/login", {
+        method: "post",
+        body: JSON.stringify({ email, password }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      result = await result.json();
+      // console.warn(result);
+      if (result.token) {
+        localStorage.setItem("user", JSON.stringify(result.loginUser));
+        localStorage.setItem("token", JSON.stringify(result.token));
+        toast.success("Login Successfully", {
+          position: "top-right",
         });
-        result = await result.json();
-        console.warn(result);
-        if(result.token){
-            localStorage.setItem("user",JSON.stringify(result.loginUser));
-            localStorage.setItem("token",JSON.stringify(result.token));
-            toast.success("Login Successfully", {
-              position: "top-right",
-            });
-            if(result.loginUser.role==="admin"){
-              console.log(result.loginUser.role);
-              navigate("/")
-            }else{
-              navigate("/");
-            }
-        }else{
-          toast.warning(result.error, {
-            position: "top-Right"
-          });
+        if (result.loginUser.role === "admin") {
+          console.log(result.loginUser.role);
+          navigate("/");
+        } else {
+          navigate("/");
         }
-    
+      } else {
+        toast.warning(result.error || "Login failed", {
+          position: "top-right"
+        });
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Network error. Please try again.", {
+        position: "top-right"
+      });
+    }
   };
 
   return (

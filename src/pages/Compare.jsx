@@ -3,11 +3,22 @@ import styled from "styled-components";
 import Chart from "react-apexcharts";
 import Summary from "../ui/Summary";
 import { toast } from 'react-toastify';
+import { useNavigate } from "react-router-dom";
+import checkAuth from "../api/checkauth";
 
 const CompareContainer = styled.div`
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: 15px;
+    max-width: 100%; /* Full width on smaller screens */
+  }
+
+  @media (max-width: 480px) {
+    padding: 10px;
+  }
 `;
 
 const Dropdown = styled.select`
@@ -22,31 +33,60 @@ const Dropdown = styled.select`
     border-color: #4caf50;
     outline: none;
   }
+
+  @media (max-width: 768px) {
+    width: 150px; /* Adjust width for mobile */
+    margin: 10px;
+  }
+
+  @media (max-width: 480px) {
+    width: 120px; /* Further reduce width for very small screens */
+    font-size: 14px;
+  }
 `;
 
 const ChartContainer = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   margin-top: 20px;
   margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const Card = styled.div`
-  background: #ffffff; /* White background for the card */
+  background: #ffffff;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  width: 450px; /* Width of the card */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 450px;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    width: 90%; /* Adjust width for smaller screens */
+    margin-bottom: 15px;
+  }
+
+  @media (max-width: 480px) {
+    width: 100%; /* Full width for very small screens */
+  }
 `;
 
 const ChartTitle = styled.h4`
   text-align: center;
   margin-bottom: 15px;
   font-size: 18px;
-  color: #333; /* Darker text for the title */
+  color: #333;
+
+  @media (max-width: 768px) {
+    font-size: 16px; /* Adjust font size for mobile */
+  }
 `;
 
 const months = [
@@ -66,8 +106,8 @@ const months = [
 
 const Compare = () => {
   const currentDate = new Date();
-  const currentMonth = currentDate.getMonth(); // 0-based index (0 = January, 11 = December)
-  const currentYear = currentDate.getFullYear(); // e.g., 2024
+  const currentMonth = currentDate.getMonth(); // 0-based index
+  const currentYear = currentDate.getFullYear(); // current year
 
   const [month1, setMonth1] = useState(months[currentMonth]);
   const [year1, setYear1] = useState(String(currentYear));
@@ -75,10 +115,22 @@ const Compare = () => {
   const [year2, setYear2] = useState(String(currentYear));
   const [chartData1, setChartData1] = useState([]);
   const [chartData2, setChartData2] = useState([]);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
   }, [month1, year1, month2, year2]);
+
+  // Handle window resize for responsive charts
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -92,7 +144,11 @@ const Compare = () => {
           },
         }
       );
-
+      const isAuthValid = await checkAuth(response);
+        if (!isAuthValid) {
+            navigate("/login");
+            return;
+        }
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
@@ -120,73 +176,149 @@ const Compare = () => {
     labels: [],
     dataLabels: {
       enabled: true,
+      style: {
+        fontSize: '12px',
+      },
+      dropShadow: {
+        enabled: false,
+      },
     },
     colors: [
-      "#00E396", // Green (Custom)
-      "#FEB019", // Orange (Retail)
-      "#FF4560", // Red (Electronic)
-      "#775DD0", // Purple (Food)
-      "#008FFB", // Blue (Travel)
-      "#00D9E9", // Teal (Utilities)
-      "#FF66C3", // Pink (Other)
-      "#D4AC2B"  // Gold (Extra Type)
+      "#00E396", // Green
+      "#FEB019", // Orange
+      "#FF4560", // Red
+      "#775DD0", // Purple
+      "#008FFB", // Blue
+      "#00D9E9", // Teal
+      "#FF66C3", // Pink
+      "#D4AC2B",  // Gold
     ],
     legend: {
       position: "bottom",
+      fontSize: '12px',
+      markers: {
+        width: 8,
+        height: 8,
+      },
+      itemMargin: {
+        horizontal: 8,
+        vertical: 4,
+      },
     },
     plotOptions: {
       pie: {
         donut: {
           size: "75%",
-          gradient: {
-            enabled: true,
+          labels: {
+            show: false, // Hide center labels to save space
           },
         },
       },
     },
+    responsive: [
+      {
+        breakpoint: 768, // Tablet breakpoint
+        options: {
+          legend: {
+            position: "bottom",
+            fontSize: '11px',
+            itemMargin: {
+              horizontal: 6,
+              vertical: 3,
+            },
+          },
+          dataLabels: {
+            enabled: false, // Disable data labels on tablet to prevent overflow
+          },
+          plotOptions: {
+            pie: {
+              donut: {
+                size: "70%", // Slightly smaller donut
+              },
+            },
+          },
+        },
+      },
+      {
+        breakpoint: 480, // Mobile breakpoint
+        options: {
+          legend: {
+            position: "bottom",
+            fontSize: '10px',
+            itemMargin: {
+              horizontal: 4,
+              vertical: 2,
+            },
+          },
+          dataLabels: {
+            enabled: false, // Disable data labels on mobile
+          },
+          plotOptions: {
+            pie: {
+              donut: {
+                size: "65%", // Smaller donut for mobile
+              },
+            },
+          },
+        },
+      },
+    ],
   };
 
   const computeSummary = () => {
     const total1 = chartData1.reduce((sum, item) => sum + item.amount, 0);
     const total2 = chartData2.reduce((sum, item) => sum + item.amount, 0);
 
-    const differences = [
+    // Calculate category differences
+    const categoryDifferences = [
       ...chartData1.map((item) => {
         const match = chartData2.find((data) => data.expenseType === item.expenseType);
         return {
           expenseType: item.expenseType,
-          amountDiff: match ? match.amount - item.amount : -item.amount,
+          amount1: item.amount,
+          amount2: match ? match.amount : 0,
+          difference: match ? match.amount - item.amount : -item.amount,
         };
       }),
       ...chartData2
         .filter((item) => !chartData1.find((data) => data.expenseType === item.expenseType))
         .map((item) => ({
           expenseType: item.expenseType,
-          amountDiff: item.amount,
+          amount1: 0,
+          amount2: item.amount,
+          difference: item.amount,
         })),
-    ];
+    ].sort((a, b) => Math.abs(b.difference) - Math.abs(a.difference)); // Sort by absolute difference
 
-    const topExpenseDiff = differences.reduce(
-      (prev, curr) =>
-        Math.abs(curr.amountDiff) > Math.abs(prev.amountDiff) ? curr : prev,
-      { expenseType: "None", amountDiff: 0 }
-    );
+    const topExpenseDiff = categoryDifferences.length > 0 ? categoryDifferences[0] : {
+      expenseType: "None",
+      difference: 0,
+      amount1: 0,
+      amount2: 0
+    };
+
+    // Calculate additional metrics
+    const categoryCount1 = chartData1.length;
+    const categoryCount2 = chartData2.length;
 
     return {
       total1,
       total2,
-      topExpenseDiff,
+      topExpenseDiff: {
+        expenseType: topExpenseDiff.expenseType,
+        amountDiff: topExpenseDiff.difference,
+        amount1: topExpenseDiff.amount1,
+        amount2: topExpenseDiff.amount2
+      },
+      categoryDifferences: categoryDifferences.slice(0, 5), // Top 5 category differences
+      categoryCount1,
+      categoryCount2,
     };
   };
 
-
-
-
-
   return (
     <CompareContainer>
-      {/* <h1>Compare Expenses</h1> */}
-      <div style={{ display: "flex", gap: "20px" }}>
+      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
         <div>
           <h3>Chart 1</h3>
           <Dropdown
@@ -250,53 +382,54 @@ const Compare = () => {
               );
             })}
           </Dropdown>
-
         </div>
       </div>
 
       <ChartContainer>
         <Card>
           <div>
-            <ChartTitle>{month1.name}</ChartTitle>
+            <ChartTitle>{month1.name} {year1}</ChartTitle>
             {
-              chartData1.length === 0 ?
+              chartData1.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "20px", color: "#888" }}>
                   No data available
                 </div>
-                :
+              ) : (
                 <Chart
                   options={{ ...chartOptions, labels: prepareChartData(chartData1).labels }}
                   series={prepareChartData(chartData1).series}
                   type="donut"
-                  width="400"
+                  width={windowWidth < 768 ? "100%" : "400"}
+                  height={windowWidth < 768 ? "300" : "400"}
                 />
+              )
             }
-
           </div>
         </Card>
         <Card>
           <div>
-            <ChartTitle>{month2.name}</ChartTitle>
+            <ChartTitle>{month2.name} {year2}</ChartTitle>
             {
-              chartData2.length === 0 ?
+              chartData2.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "20px", color: "#888" }}>
                   No data available
                 </div>
-                :
+              ) : (
                 <Chart
                   options={{ ...chartOptions, labels: prepareChartData(chartData2).labels }}
                   series={prepareChartData(chartData2).series}
                   type="donut"
-                  width="400"
+                  width={windowWidth < 768 ? "100%" : "400"}
+                  height={windowWidth < 768 ? "300" : "400"}
                 />
+              )
             }
-
           </div>
         </Card>
       </ChartContainer>
 
       {
-        chartData2.length > 0 && <Summary summary={computeSummary()} month1Name={month1.name} month2Name={month2.name} />
+        chartData2.length > 0 && <Summary summary={computeSummary()} month1Name={month1.name} month2Name={month2.name} year1={year1} year2={year2} />
       }
 
     </CompareContainer>

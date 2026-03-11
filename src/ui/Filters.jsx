@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 const FiltersContainer = styled.div`
@@ -34,9 +34,15 @@ const Button = styled.button`
   }
 `;
 
-const Filters = ({ setFilters }) => {
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+const Filters = ({ setFilters, currentFilters }) => {
+  const [startDate, setStartDate] = useState(currentFilters?.startDate || '');
+  const [endDate, setEndDate] = useState(currentFilters?.endDate || '');
+
+  // Update local state when currentFilters change
+  useEffect(() => {
+    setStartDate(currentFilters?.startDate || '');
+    setEndDate(currentFilters?.endDate || '');
+  }, [currentFilters]);
 
   const handleApplyFilters = () => {
     setFilters({ startDate, endDate });

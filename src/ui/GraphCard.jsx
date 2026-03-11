@@ -3,33 +3,67 @@ import styled from 'styled-components';
 import Chart from 'react-apexcharts';
 
 const Card = styled.div`
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  background: var(--color-grey-0);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+    max-width: 100%;
+  }
 `;
 
 const Title = styled.h4`
-  font-size: 18px;
-  margin-bottom: 10px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: var(--color-grey-900);
 `;
 
 const FallbackMessage = styled.div`
   text-align: center;
-  padding: 20px;
-  color: #888;
+  padding: 40px;
+  color: var(--color-grey-400);
+  font-size: 1.5rem;
 `;
 
 const GraphCard = ({ title, data, type }) => {
+  const isDarkMode = document.documentElement.getAttribute("data-theme") === "dark";
+
   const transformData = () => {
-    if (!data || data.length === 0) return null; // Handle empty data
+    if (!data || data.length === 0) return null;
+
+    const commonOptions = {
+      theme: {
+        mode: isDarkMode ? 'dark' : 'light',
+      },
+      chart: {
+        background: 'transparent',
+        fontFamily: 'Poppins, sans-serif',
+        toolbar: { show: false }
+      },
+      grid: {
+        borderColor: 'var(--glass-border)',
+        strokeDashArray: 4,
+      }
+    };
 
     if (type === 'donut') {
       return {
         options: {
+          ...commonOptions,
           labels: data.map((item) => item.category),
+          legend: { labels: { colors: 'var(--color-grey-600)' } }
         },
         series: data.map((item) => item.amount),
       };
@@ -37,47 +71,45 @@ const GraphCard = ({ title, data, type }) => {
 
     if (type === 'bar') {
       const seriesData = data.map((item) => item.amount);
-      // Check for invalid values
-      if (seriesData.some((amount) => isNaN(amount))) {
-        console.warn('Invalid data detected');
-        return null;
-      }
+      if (seriesData.some((amount) => isNaN(amount))) return null;
 
       return {
         options: {
+          ...commonOptions,
           xaxis: {
             categories: data.map((item) => item.item),
+            labels: { style: { colors: 'var(--color-grey-500)' } }
           },
+          yaxis: {
+            labels: { 
+              style: { colors: 'var(--color-grey-500)' },
+              formatter: (val) => val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val
+            }
+          }
         },
-        series: [
-          {
-            name: 'Spending',
-            data: seriesData,
-          },
-        ],
+        series: [{ name: 'Spending', data: seriesData }],
       };
     }
 
     if (type === 'line') {
       return {
         options: {
+          ...commonOptions,
           xaxis: {
-            categories: data.map((item) => item.date), // X-axis categories (e.g., dates)
+            categories: data.map((item) => item.date),
+            labels: { style: { colors: 'var(--color-grey-500)' } }
           },
+          yaxis: {
+            labels: { 
+              style: { colors: 'var(--color-grey-500)' },
+              formatter: (val) => val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val
+            }
+          }
         },
-        series: [
-          {
-            name: 'Spending', // Label for the line chart series
-            data: data.map((item) => item.amount), // Series data (spending amounts)
-          },
-        ],
+        series: [{ name: 'Spending', data: data.map((item) => item.amount) }],
       };
     }
-
-    return {
-      options: {},
-      series: [],
-    };
+    return null;
   };
 
   const chartData = transformData();
@@ -90,7 +122,7 @@ const GraphCard = ({ title, data, type }) => {
           options={chartData.options}
           series={chartData.series}
           type={type}
-          width="100%"
+          width="100%"  // Ensure the chart width is responsive
         />
       ) : (
         <FallbackMessage>No data available</FallbackMessage>

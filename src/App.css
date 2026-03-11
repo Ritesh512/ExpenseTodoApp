@@ -1,0 +1,32 @@
+.toast-container {
+    font-size: 18px; /* Increased font size for larger screens */
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    width: auto; /* Default width */
+  }
+  
+  /* Additional styles to make toasts larger */
+  .toast-container .Toastify__toast {
+    font-size: 18px;
+    padding: 16px 20px;
+    min-height: 60px;
+    min-width: 350px; /* Increased width for larger toasts */
+  }
+  
+  @media (max-width: 500px) {
+    .toast-container {
+      font-size: 14px; /* Slightly larger font size for mobile screens */
+      max-width: 90%; /* Adjust width for smaller screens */
+      width: 60%; /* Slightly wider for mobile */
+      right: 1rem;
+      margin-left: 40%;
+    }
+    .toast-container .Toastify__toast {
+      font-size: 14px;
+      padding: 12px 16px;
+      min-height: 50px;
+      min-width: 250px; /* Increased width for mobile toasts */
+    }
+  }

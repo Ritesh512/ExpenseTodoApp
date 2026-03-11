@@ -1,13 +1,38 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import checkAuth from "../api/checkauth";
 
 const UserProfile = () => {
   const [profile, setProfile] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/user/profile")
-      .then((response) => response.json())
-      .then((data) => setProfile(data));
-  }, []);
+    const fetchProfile = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/api/user/profile", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
+                },
+            });
+
+            const isAuthValid = await checkAuth(response);
+            if (!isAuthValid) {
+                navigate("/login"); // Redirect to login if authentication fails
+                return;
+            }
+
+            const data = await response.json();
+            setProfile(data);
+        } catch (error) {
+            console.error("Error fetching profile:", error);
+        }
+    };
+
+    fetchProfile();
+}, []);
+
 
   if (!profile) return <div>Loading...</div>;
 
