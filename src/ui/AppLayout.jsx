@@ -25,29 +25,34 @@ const Main = styled.main`
   /* Reduce padding for laptops */
   @media (max-width: 1024px) {
     padding: 3rem;
+    padding-bottom: 8rem; /* Space for fixed bottom sidebar */
   }
 
   /* Reduce padding further for tablets and mobile */
   @media (max-width: 768px) {
     padding: 2rem;
+    padding-bottom: 9rem; /* Slightly more space for mobile bottom bar */
   }
 `;
 
 const BottomSidebarWrapper = styled.div`
-  background-color: var(--color-grey-0);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   position: fixed;
   bottom: 0;
   width: 100%;
-  border-top: 1px solid var(--color-grey-100);
-  z-index: 10;
+  border-top: 1px solid var(--glass-border);
+  z-index: 100; /* Higher z-index */
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
 `;
 
-function AppLayout() {
+function AppLayout({ theme, toggleTheme }) {
   const isSmallScreen = useMediaQuery({ maxWidth: 1024 });
 
   return (
     <StyledAppLayout>
-      <Header />
+      <Header theme={theme} toggleTheme={toggleTheme} />
       {!isSmallScreen && <Sidebar />} {/* Sidebar on larger screens */}
       <Main>
         <Outlet />

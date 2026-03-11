@@ -4,62 +4,72 @@ import AIInsights from '../ui/AIInsights';
 
 const PageContainer = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #f3ec78, #af4261);
-  padding: 20px;
+  background-color: var(--color-bg-main);
+  padding: 40px 20px;
   display: flex;
   justify-content: center;
 
   @media (max-width: 768px) {
-    padding: 15px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 10px;
+    padding: 20px 15px;
   }
 `;
 
 const ContentWrapper = styled.div`
   width: 100%;
-  max-width: 1200px;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 `;
 
 const Header = styled.div`
-  background: white;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-lg);
+  padding: 30px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
 
-  @media (max-width: 768px) {
-    padding: 15px;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--color-brand-600);
   }
 
-  @media (max-width: 480px) {
-    padding: 12px;
+  @media (max-width: 768px) {
+    padding: 20px;
   }
 `;
 
 const Title = styled.h1`
-  color: #333;
+  color: var(--color-grey-900);
   margin: 0;
-  font-size: 2rem;
+  font-size: 2.8rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
 
   @media (max-width: 768px) {
-    font-size: 1.5rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1.2rem;
+    font-size: 2.2rem;
   }
 `;
 
 const Subtitle = styled.p`
-  color: #666;
-  margin: 10px 0 0 0;
-  font-size: 1.5rem;
+  color: var(--color-grey-500);
+  margin: 8px 0 0 0;
+  font-size: 1.6rem;
+  line-height: 1.6;
 
-  @media (max-width: 480px) {
-    font-size: 0.85rem;
+  @media (max-width: 768px) {
+    font-size: 1.4rem;
   }
 `;
 

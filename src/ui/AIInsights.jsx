@@ -17,258 +17,265 @@ import {
 /* ---------------- Layout ---------------- */
 
 const Container = styled.div`
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-  padding:20px;
-  background:#f8f9fa;
-  border-radius:10px;
-
-  @media(max-width:768px){
-    padding:15px;
-  }
-
-  @media(max-width:480px){
-    padding:10px;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: fadeIn 0.5s ease-out;
 `;
 
 const TabsContainer = styled.div`
-  display:flex;
-  gap:10px;
-  overflow-x:auto;
+  display: flex;
+  gap: 12px;
+  padding: 4px;
+  background: var(--color-bg-accent);
+  border-radius: var(--border-radius-md);
+  overflow-x: auto;
+  border: 1px solid var(--glass-border);
 
-  &::-webkit-scrollbar{
-    display:none;
+  &::-webkit-scrollbar {
+    display: none;
   }
 `;
 
 const TabButton = styled.button`
-  padding:10px 18px;
-  border:none;
-  border-radius:6px;
-  background:${p => p.active ? "#667eea" : "#e0e0e0"};
-  color:${p => p.active ? "white" : "#333"};
-  cursor:pointer;
-  font-weight:500;
-  white-space:nowrap;
+  padding: 10px 20px;
+  border-radius: var(--border-radius-sm);
+  background: ${p => p.active ? "var(--color-brand-600)" : "transparent"};
+  color: ${p => p.active ? "white" : "var(--color-grey-500)"};
+  font-weight: 600;
+  font-size: 1.4rem;
+  transition: all 0.3s;
+  white-space: nowrap;
 
-  @media(max-width:480px){
-    padding:8px 14px;
-    font-size:13px;
+  &:hover {
+    color: ${p => p.active ? "white" : "var(--color-grey-900)"};
+    background: ${p => p.active ? "var(--color-brand-600)" : "var(--color-bg-card)"};
   }
 `;
 
 const ContentBox = styled.div`
-  background:white;
-  border-radius:8px;
-  padding:20px;
-  max-height:650px;
-  overflow-y:auto;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-lg);
+  padding: 30px;
+  min-height: 400px;
+  box-shadow: var(--shadow-md);
 
-  @media(max-width:768px){
-    padding:15px;
-  }
-
-  @media(max-width:480px){
-    padding:12px;
+  @media (max-width: 768px) {
+    padding: 20px;
   }
 `;
 
 const Title = styled.h3`
-  margin-bottom:15px;
-  border-bottom:2px solid #667eea;
-  padding-bottom:8px;
-  color:#333;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  margin-top: 30px;
+  color: var(--color-grey-900);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 
-  @media(max-width:480px){
-    font-size:16px;
+  &:first-child {
+    margin-top: 0;
+  }
+
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--glass-border);
   }
 `;
 
-/* ---------------- Cards ---------------- */
-
 const SummaryGrid = styled.div`
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:15px;
-
-  @media(max-width:480px){
-    grid-template-columns:repeat(2,1fr);
-  }
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
 `;
 
 const SummaryCard = styled.div`
-  background:linear-gradient(135deg,#667eea,#764ba2);
-  color:white;
-  padding:15px;
-  border-radius:8px;
-  text-align:center;
+  background: linear-gradient(135deg, var(--color-brand-600) 0%, var(--color-brand-800) 100%);
+  color: white;
+  padding: 24px;
+  border-radius: var(--border-radius-md);
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
+  transition: transform 0.3s;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
 `;
 
 const SummaryLabel = styled.div`
-  font-size:12px;
+  font-size: 1.2rem;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
 `;
 
 const SummaryValue = styled.div`
-  font-size:18px;
-  font-weight:bold;
+  font-size: 2.4rem;
+  font-weight: 800;
 `;
 
-/* ---------------- Categories ---------------- */
-
 const CategoryList = styled.div`
-  display:flex;
-  flex-direction:column;
-  gap:12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 `;
 
 const CategoryItem = styled.div`
-  background:#f5f5f5;
-  padding:12px;
-  border-radius:6px;
+  background: var(--color-bg-accent);
+  padding: 20px;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--glass-border);
 `;
 
 const CategoryName = styled.div`
-  font-weight:600;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--color-grey-900);
+  margin-bottom: 10px;
 `;
 
 const CategoryStats = styled.div`
-  display:flex;
-  justify-content:space-between;
-  margin-top:6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
 `;
 
-const Amount = styled.span`
-  font-weight:bold;
-  color:#667eea;
+const AmountString = styled.span`
+  font-weight: 700;
+  color: var(--color-brand-500);
+  font-size: 1.6rem;
 `;
 
-const Percentage = styled.span`
-  color:#999;
+const PercentageString = styled.span`
+  color: var(--color-grey-500);
+  font-size: 1.4rem;
 `;
-
-/* ---------------- Progress Bar ---------------- */
 
 const ProgressBar = styled.div`
-  height:6px;
-  background:#e0e0e0;
-  border-radius:5px;
-  margin-top:6px;
+  height: 8px;
+  background: var(--color-grey-200);
+  border-radius: 4px;
+  overflow: hidden;
 `;
 
 const Progress = styled.div`
-  height:100%;
-  background:#667eea;
-  border-radius:5px;
-  width:${p => p.percent}%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-brand-500), var(--color-brand-700));
+  width: ${p => p.percent}%;
+  transition: width 1s ease-out;
 `;
 
-/* ---------------- Top Expenses ---------------- */
-
-const ExpenseItem = styled.div`
-  background:#fff5f5;
-  padding:12px;
-  border-radius:6px;
-  border-left:4px solid #ff6b6b;
-  display:flex;
-  justify-content:space-between;
+const ExpenseCard = styled.div`
+  background: var(--color-bg-card);
+  padding: 16px 20px;
+  border-radius: var(--border-radius-md);
+  border-left: 4px solid var(--color-red-700);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+  
+  span:first-child {
+    font-weight: 600;
+    color: var(--color-grey-900);
+  }
+  
+  span:last-child {
+    color: var(--color-brand-600);
+    font-weight: 700;
+  }
 `;
-
-/* ---------------- AI Box ---------------- */
 
 const AIBox = styled.div`
-  background:linear-gradient(135deg,#eef2ff,#f7f8ff);
-  border-left:4px solid #667eea;
-  padding:18px;
-  border-radius:8px;
-  font-size:14px;
-  line-height:1.7;
+  background: var(--color-bg-accent);
+  border: 1px solid var(--color-brand-100);
+  padding: 24px;
+  border-radius: var(--border-radius-lg);
+  font-size: 1.5rem;
+  line-height: 1.8;
+  color: var(--color-grey-800);
 
-  h1,h2,h3{
-    margin-top:10px;
-    color:#333;
+  h1, h2, h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: var(--color-grey-900);
   }
 
-  strong{
-    color:#667eea;
+  strong {
+    color: var(--color-brand-600);
   }
 
-  ul{
-    padding-left:18px;
+  ul, ol {
+    padding-left: 20px;
+    margin: 15px 0;
   }
 
-  li{
-    margin-bottom:6px;
-  }
-
-  @media(max-width:480px){
-    font-size:13px;
-    padding:14px;
+  li {
+    margin-bottom: 10px;
   }
 `;
 
 const AIBadge = styled.div`
-  display:inline-block;
-  background:#667eea;
-  color:white;
-  padding:4px 10px;
-  border-radius:20px;
-  font-size:12px;
-  margin-bottom:10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-brand-500);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
 `;
 
-/* ---------------- Loading ---------------- */
-
 const Loading = styled.div`
-  text-align:center;
-  padding:40px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:15px;
+  text-align: center;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 `;
 
 const SpinnerIcon = styled(FaSpinner)`
-  font-size:36px;
-  color:#667eea;
-  animation:spin 1s linear infinite;
+  font-size: 4rem;
+  color: var(--color-brand-500);
+  animation: spin 1s linear infinite;
 
-  @keyframes spin{
-    from{ transform:rotate(0deg); }
-    to{ transform:rotate(360deg); }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 `;
 
 const LoadingText = styled.p`
-  color:#666;
-  font-size:16px;
-  margin:0;
-
-  @media(max-width:480px){
-    font-size:14px;
-  }
+  color: var(--color-grey-500);
+  font-size: 1.6rem;
+  margin: 0;
 `;
 
-/* ---------------- Error Messages ---------------- */
-
 const ErrorMessage = styled.div`
-  background:${p => p.isRateLimit ? "#fff3cd" : "#f8d7da"};
-  border:1px solid ${p => p.isRateLimit ? "#ffc107" : "#f5c6cb"};
-  color:${p => p.isRateLimit ? "#856404" : "#721c24"};
-  padding:16px;
-  border-radius:8px;
-  margin:10px 0;
-  font-size:15px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-
-  @media(max-width:480px){
-    font-size:13px;
-    padding:12px;
-  }
+  background: ${p => p.isRateLimit ? "rgba(251, 191, 36, 0.1)" : "rgba(248, 113, 113, 0.1)"};
+  border: 1px solid ${p => p.isRateLimit ? "var(--color-yellow-700)" : "var(--color-red-700)"};
+  color: ${p => p.isRateLimit ? "var(--color-yellow-700)" : "var(--color-red-700)"};
+  padding: 20px;
+  border-radius: var(--border-radius-md);
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
 `;
 
 const ErrorIcon = styled.span`
@@ -417,8 +424,8 @@ const AIInsights = ({ dateRange, month, year }) => {
                                     </ProgressBar>
 
                                     <CategoryStats>
-                                        <Amount>₹{c.amount.toLocaleString()}</Amount>
-                                        <Percentage>{c.percentage}%</Percentage>
+                                        <AmountString>₹{c.amount.toLocaleString()}</AmountString>
+                                        <PercentageString>{c.percentage}%</PercentageString>
                                     </CategoryStats>
 
                                 </CategoryItem>
@@ -432,10 +439,10 @@ const AIInsights = ({ dateRange, month, year }) => {
                         <CategoryList>
 
                             {analysis.topExpenses?.map((e, i) => (
-                                <ExpenseItem key={i}>
+                                <ExpenseCard key={i}>
                                     <span>{e.name}</span>
                                     <span>₹{e.amount.toLocaleString()} ({e.category})</span>
-                                </ExpenseItem>
+                                </ExpenseCard>
                             ))}
 
                         </CategoryList>
@@ -500,10 +507,16 @@ const AIInsights = ({ dateRange, month, year }) => {
 
                         <ResponsiveContainer width="100%" height={250}>
                             <LineChart data={forecast.historicalData}>
-                                <XAxis dataKey="month" />
-                                <YAxis />
-                                <Tooltip />
-                                <Line type="monotone" dataKey="total" stroke="#667eea" strokeWidth={3} />
+                                <XAxis dataKey="month" stroke="var(--color-grey-500)" fontSize={12} />
+                                <YAxis stroke="var(--color-grey-500)" fontSize={12} />
+                                <Tooltip 
+                                    contentStyle={{ 
+                                        backgroundColor: 'var(--color-grey-0)', 
+                                        borderColor: 'var(--glass-border)',
+                                        color: 'var(--color-grey-900)'
+                                    }} 
+                                />
+                                <Line type="monotone" dataKey="total" stroke="var(--color-brand-500)" strokeWidth={3} dot={{ fill: 'var(--color-brand-500)' }} />
                             </LineChart>
                         </ResponsiveContainer>
 

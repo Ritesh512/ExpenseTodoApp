@@ -16,6 +16,8 @@ const animatedComponents = makeAnimated();
 // Styled components with media queries for responsiveness
 const Container = styled.div`
   padding: 20px;
+  background-color: var(--color-bg-main);
+  min-height: 100vh;
   @media (max-width: 768px) {
     padding: 10px;
   }
@@ -26,33 +28,25 @@ const Row = styled.div`
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  gap: 2rem;
   @media (max-width: 768px) {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
 `;
 
 const ButtonWrapper = styled.div`
   display: flex;
   gap: 20px;
-  width: 100%; /* Ensure full width for both small and large screens */
-  flex-wrap: nowrap; /* Prevent wrapping for both small and large screens */
+  flex-wrap: nowrap;
 
   @media (max-width: 768px) {
-    gap: 10px; /* Adjust gap for smaller screens */
-  }
-`;
-
-const StyledButton = styled(Button)`
-  font-size: 15px; /* Default font size for larger screens */
-
-  @media (max-width: 768px) {
-    font-size: 12px; /* Smaller font size for mobile screens */
+    gap: 10px;
   }
 `;
 
 const SelectWrapper = styled.div`
-  width: 20%;
+  width: 25rem;
   @media (max-width: 768px) {
     width: 100%;
     margin-top: 10px;
@@ -65,7 +59,8 @@ const ModalOverlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -73,22 +68,22 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalContainer = styled.div`
-  background-color: #fff;
+  background-color: var(--color-grey-0);
   padding: 30px;
-  border-radius: 8px;
-  width: 400px;
-  position: relative;
+  border-radius: var(--border-radius-lg);
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  z-index: 1001;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-lg);
+  position: relative;
 
   h2 {
-    margin-bottom: 10px;
+    margin-bottom: 2rem;
+    color: var(--color-grey-900);
+    font-size: 2.4rem;
   }
 
   @media (max-width: 768px) {
-    width: 80%;
     padding: 20px;
   }
 `;
@@ -96,31 +91,71 @@ const ModalContainer = styled.div`
 const CloseButton = styled.button`
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 2.8rem;
   cursor: pointer;
   position: absolute;
-  top: 10px;
-  right: 20px;
-`;
+  top: 1.5rem;
+  right: 2rem;
+  color: var(--color-grey-400);
+  transition: color 0.2s;
 
-const TodoWrapper = styled.div`
-  margin-top: 50px;
-  width: 100%;
-  @media (max-width: 768px) {
-    margin-top: 20px;
+  &:hover {
+    color: var(--color-grey-900);
   }
 `;
 
-const Message = styled.h1`
-  font-size: 24px;
-  color: #333;
-  text-align: center;
-  margin-top: 20px;
-  padding: 10px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+const TodoWrapper = styled.div`
+  margin-top: 40px;
+  width: 100%;
 `;
+
+const Message = styled.h2`
+  font-size: 2rem;
+  color: var(--color-grey-500);
+  text-align: center;
+  margin-top: 40px;
+  padding: 30px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-md);
+`;
+
+const customSelectStyles = {
+  control: (provided, state) => ({
+    ...provided,
+    backgroundColor: 'var(--glass-bg)',
+    borderColor: 'var(--glass-border)',
+    color: 'var(--color-grey-900)',
+    '&:hover': {
+      borderColor: 'var(--color-brand-600)',
+    },
+    boxShadow: state.isFocused ? '0 0 0 1px var(--color-brand-600)' : 'none',
+    borderRadius: 'var(--border-radius-sm)',
+    fontSize: '1.4rem'
+  }),
+  menu: (provided) => ({
+    ...provided,
+    backgroundColor: 'var(--color-grey-0)',
+    border: '1px solid var(--glass-border)',
+    boxShadow: 'var(--shadow-md)',
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: state.isSelected 
+      ? 'var(--color-brand-600)' 
+      : state.isFocused 
+        ? 'var(--color-bg-accent)' 
+        : 'transparent',
+    color: state.isSelected ? 'white' : 'var(--color-grey-900)',
+    '&:active': {
+      backgroundColor: 'var(--color-brand-700)',
+    }
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    color: 'var(--color-grey-900)',
+  })
+};
 
 const Todo = () => {
   const [listName, setListName] = useState('');
@@ -162,8 +197,6 @@ const Todo = () => {
           value: list._id,
         }));
         setUserList(options);
-        // handleChange(options[0]);
-        // navigate(`/todo/${options[0].value}`);
       } catch (error) {
         console.error("Error fetching todo lists:", error);
       }
@@ -259,22 +292,22 @@ const Todo = () => {
       <Row>
         <ButtonWrapper>
           <Button
-            style={{ fontSize: '15px' }}
             variant="contained"
             size="large"
             startIcon={<AddCircleOutlineIcon />}
             onClick={openModal}
+            sx={{ borderRadius: '8px', textTransform: 'none', px: 3 }}
           >
-            Add New List
+            Add List
           </Button>
           <Button
-            style={{ fontSize: '15px' }}
-            variant="contained"
+            variant="outlined"
             size="large"
             startIcon={<EditIcon />}
             onClick={handleEditList}
+            sx={{ borderRadius: '8px', textTransform: 'none', px: 3, color: 'var(--color-grey-600)', borderColor: 'var(--glass-border)' }}
           >
-            Edit List
+            Edit
           </Button>
         </ButtonWrapper>
 
@@ -285,6 +318,8 @@ const Todo = () => {
             options={userList}
             defaultValue={userList[0]}
             onChange={handleChange}
+            styles={customSelectStyles}
+            placeholder="Select Todo List..."
           />
         </SelectWrapper>
       </Row>
@@ -294,30 +329,40 @@ const Todo = () => {
           listId !== null ?
             <TodoItemComponent userTodo={userTodo} listId={listId} setUserTodo={setUserTodo} />
             :
-            <Message>Please select a list to view tasks</Message>
+            <Message>Select a list from the menu to start tracking tasks.</Message>
         ) : (
-          <Message>No List Added</Message>
+          <Message>No Todo lists yet. Start by creating one!</Message>
         )}
       </TodoWrapper>
 
       {isModalOpen && (
-        <ModalOverlay>
-          <ModalContainer>
+        <ModalOverlay onClick={closeModal}>
+          <ModalContainer onClick={e => e.stopPropagation()}>
             <CloseButton onClick={closeModal}>&times;</CloseButton>
-            <h2>Add New List</h2>
+            <h2>Create New List</h2>
             <input
               type="text"
-              placeholder="List Name"
+              placeholder="List Name (e.g. Shopping, Work)"
               value={listName}
               onChange={(e) => setListName(e.target.value)}
-              style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+              style={{ 
+                width: '100%', 
+                padding: '12px', 
+                marginBottom: '20px', 
+                background: 'var(--color-bg-accent)',
+                border: '1px solid var(--glass-border)',
+                borderRadius: '8px',
+                color: 'var(--color-grey-900)',
+                fontSize: '1.6rem'
+              }}
             />
             <Button
               variant="contained"
+              fullWidth
               onClick={addNewList}
-              sx={{ fontSize: '12px', marginTop: '10px' }}
+              sx={{ borderRadius: '8px', py: 1.5, fontSize: '1.4rem' }}
             >
-              Save List
+              Start List
             </Button>
           </ModalContainer>
         </ModalOverlay>
