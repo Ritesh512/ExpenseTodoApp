@@ -1,343 +1,22 @@
 import React, { useState, useEffect } from "react";
-import styled, { keyframes } from "styled-components";
-import { FaEdit, FaTrash, FaSearch, FaFilter, FaCalendarAlt } from "react-icons/fa";
+import {
+  FaEdit,
+  FaTrash,
+  FaSearch,
+  FaFilter,
+  FaCalendarAlt,
+  FaFilePdf,
+  FaFileExcel,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import checkAuth from "../api/checkauth";
-import { FaFilePdf, FaFileExcel } from "react-icons/fa";
 import {
   downloadExpensesPDF,
   downloadExpensesExcel,
 } from "../utils/exportExpenses";
 
-/* ================= ANIMATIONS ================= */
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-`;
-
-const shimmer = keyframes`
-  0% { background-position: -468px 0; }
-  100% { background-position: 468px 0; }
-`;
-
-/* ================= CONSTANTS ================= */
 const ITEMS_PER_PAGE = 10;
-
-/* ================= STYLED COMPONENTS ================= */
-const PageContainer = styled.div`
-  min-height: 100vh;
-  background-color: var(--color-bg-main);
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-`;
-
-const ContentWrapper = styled.div`
-  width: 100%;
-  max-width: 1100px;
-  animation: ${fadeIn} 0.6s ease-out;
-`;
-
-const GlassCard = styled.div`
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--border-radius-lg);
-  padding: 24px;
-  box-shadow: var(--shadow-lg);
-  margin-bottom: 24px;
-`;
-
-const FilterSection = styled(GlassCard)`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 20px;
-  padding: 20px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border-bottom: 1px solid var(--glass-border);
-`;
-
-const InputGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 8px 16px;
-  border-radius: var(--border-radius-md);
-  border: 1px solid var(--glass-border);
-  transition: all 0.3s ease;
-
-  &:focus-within {
-    border-color: var(--color-brand-500);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-  }
-
-  & label {
-    color: var(--color-grey-400);
-    font-size: 1.4rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-`;
-
-const Select = styled.select`
-  background: transparent;
-  border: none;
-  color: var(--color-grey-800);
-  font-size: 1.5rem;
-  padding: 4px;
-  cursor: pointer;
-  outline: none;
-
-  & option {
-    background: var(--color-grey-0);
-    color: var(--color-grey-800);
-  }
-`;
-
-const SearchInput = styled.input`
-  background: transparent;
-  border: none;
-  color: var(--color-grey-800);
-  font-size: 1.5rem;
-  width: 180px;
-  outline: none;
-
-  &::placeholder {
-    color: var(--color-grey-400);
-  }
-
-  @media (max-width: 480px) {
-    width: 100%;
-  }
-`;
-
-const ExpenseList = styled.div`
-  max-height: 60vh;
-  overflow-y: auto;
-  padding-right: 8px;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: var(--glass-border);
-    border-radius: 10px;
-  }
-`;
-
-const ExpenseItem = styled.div`
-  display: grid;
-  grid-template-columns: 1fr auto auto auto;
-  align-items: center;
-  gap: 2rem;
-  padding: 1.6rem 2.4rem;
-  background: var(--color-bg-card);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--border-radius-md);
-  margin-bottom: 1.2rem;
-  animation: ${fadeIn} 0.4s ease-out forwards;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &:hover {
-    transform: translateX(8px);
-    border-color: var(--color-brand-500);
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
-  }
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr auto;
-    gap: 1rem;
-    padding: 1.2rem 1.6rem;
-  }
-`;
-
-const ItemInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-
-  h3 {
-    font-size: 1.6rem;
-    font-weight: 600;
-    color: var(--color-grey-900);
-  }
-
-  span {
-    font-size: 1.2rem;
-    color: var(--color-grey-500);
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-  }
-`;
-
-const Amount = styled.div`
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--color-brand-500);
-  text-align: right;
-
-  @media (max-width: 768px) {
-    font-size: 1.6rem;
-    grid-row: 1;
-    grid-column: 2;
-  }
-`;
-
-const ActionIcons = styled.div`
-  display: flex;
-  gap: 0.8rem;
-
-  @media (max-width: 768px) {
-    grid-row: 2;
-    grid-column: 2;
-    gap: 0.4rem;
-  }
-`;
-
-const IconButton = styled.button`
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--glass-border);
-  padding: 8px;
-  border-radius: var(--border-radius-sm);
-  cursor: pointer;
-  color: var(--color-grey-400);
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    color: var(--color-brand-500);
-    background: var(--color-bg-accent);
-    transform: translateY(-2px);
-  }
-
-  &.delete:hover {
-    color: var(--color-red-700);
-    background: rgba(248, 113, 113, 0.1);
-  }
-`;
-
-const PaginationWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-top: 32px;
-  padding-bottom: 20px;
-`;
-
-const PageButton = styled.button`
-  min-width: 40px;
-  height: 40px;
-  border-radius: var(--border-radius-sm);
-  border: 1px solid var(--glass-border);
-  cursor: pointer;
-  background: ${({ active }) => (active ? "var(--color-brand-600)" : "var(--glass-bg)")};
-  color: ${({ active }) => (active ? "#fff" : "var(--color-grey-400)")};
-  transition: all 0.3s ease;
-  font-weight: 600;
-
-  &:hover:not(:disabled) {
-    background: var(--color-brand-500);
-    color: white;
-    transform: translateY(-2px);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const ExportButtons = styled.div`
-  display: flex;
-  gap: 12px;
-`;
-
-const ExportButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: var(--border-radius-md);
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 1.4rem;
-  transition: all 0.3s ease;
-  background: ${({ type }) =>
-    type === "pdf" ? "rgba(239, 68, 68, 0.1)" : "rgba(52, 211, 153, 0.1)"};
-  color: ${({ type }) =>
-    type === "pdf" ? "var(--color-red-700)" : "var(--color-green-700)"};
-  border: 1px solid ${({ type }) =>
-    type === "pdf" ? "rgba(239, 68, 68, 0.2)" : "rgba(52, 211, 153, 0.2)"};
-
-  &:hover {
-    transform: translateY(-2px);
-    background: ${({ type }) =>
-      type === "pdf" ? "var(--color-red-700)" : "var(--color-green-700)"};
-    color: white;
-  }
-`;
-
-const TotalAmount = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 24px 0;
-  padding: 0 10px;
-`;
-
-const TotalCard = styled.div`
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-  color: #ffffff;
-  padding: 16px 28px;
-  border-radius: var(--border-radius-lg);
-  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
-  font-weight: 800;
-  font-size: 2.2rem;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-
-  &:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
-  }
-
-  & span {
-    font-size: 1.4rem;
-    font-weight: 500;
-    opacity: 0.9;
-  }
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 2.4rem;
-  color: var(--color-grey-900);
-  font-weight: 700;
-  margin-bottom: 8px;
-`;
-
-/* ================= COMPONENT ================= */
 
 const ViewExpense = () => {
   const [expenses, setExpenses] = useState([]);
@@ -362,15 +41,15 @@ const ViewExpense = () => {
   const fetchExpenses = async () => {
     try {
       setError(null);
-      const token = JSON.parse(localStorage.getItem("token"));
+
       const response = await fetch(
-        `http://localhost:3000/api/expenses/filter/month?month=${month}&year=${year}`,
+        `https://expense-todo-five.vercel.app/api/expenses/filter/month?month=${month}&year=${year}`,
         {
           headers: {
             "Content-Type": "application/json",
-            authorization: `bearer ${token}`,
+            authorization: `bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
 
       const isAuthValid = await checkAuth(response);
@@ -379,30 +58,28 @@ const ViewExpense = () => {
         return;
       }
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch expenses");
-      }
+      if (!response.ok) throw new Error();
 
       const data = await response.json();
       setExpenses(data);
-    } catch (err) {
-      setError("Failed to fetch expenses. Please try again.");
+    } catch {
+      setError("Failed to fetch expenses");
     }
   };
 
   const deleteExpense = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this expense?")) return;
+    if (!window.confirm("Delete this expense?")) return;
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/expenses/${id}`,
+        `https://expense-todo-five.vercel.app/api/expenses/${id}`,
         {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
+            authorization: `bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
 
       const isAuthValid = await checkAuth(response);
@@ -412,12 +89,10 @@ const ViewExpense = () => {
       }
 
       if (response.ok) {
-        toast.success("Expense Deleted!");
+        toast.success("Expense Deleted");
         setExpenses((prev) => prev.filter((e) => e._id !== id));
-      } else {
-        toast.warning("Failed to delete expense");
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong");
     }
   };
@@ -433,14 +108,16 @@ const ViewExpense = () => {
       searchTerm === "" ||
       expense.expenseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       expense.issuedTo.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesCategory =
       selectedCategory === "" || expense.expenseType === selectedCategory;
+
     return matchesSearch && matchesCategory;
   });
 
   const totalAmount = filteredExpenses.reduce(
     (sum, e) => sum + (parseFloat(e.amount) || 0),
-    0
+    0,
   );
 
   const totalPages = Math.ceil(filteredExpenses.length / ITEMS_PER_PAGE);
@@ -448,164 +125,212 @@ const ViewExpense = () => {
   const paginatedExpenses = filteredExpenses
     .slice()
     .reverse()
-    .slice(
-      (currentPage - 1) * ITEMS_PER_PAGE,
-      currentPage * ITEMS_PER_PAGE
-    );
+    .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
-    <PageContainer>
-      <ContentWrapper>
-        <TotalAmount>
-          <div>
-            <SectionTitle>Expenses</SectionTitle>
-            <p style={{ color: 'var(--color-grey-400)', fontSize: '1.4rem' }}>
-              Track and manage your monthly spending
-            </p>
+    <div className="bg-[var(--bg-main)] p-0 md:p-4">
+      <div className="max-w-5xl mx-auto">
+        {/* HEADER */}
+        <div className="mb-2">
+          <div className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-2 rounded-lg font-semibold text-sm shadow">
+            Expenses - ₹{totalAmount.toFixed(2)}
           </div>
-          <TotalCard>
-            <span>{selectedCategory ? `${selectedCategory}` : "Total Spent"}</span>
-            ₹{totalAmount.toFixed(2)}
-          </TotalCard>
-        </TotalAmount>
+        </div>
 
-        <FilterSection>
-          <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-            <InputGroup>
-              <label><FaCalendarAlt /></label>
-              <Select value={month} onChange={(e) => setMonth(e.target.value)}>
+        {/* FILTER BAR */}
+        <div className="bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-lg p-3 mb-4 flex flex-col md:flex-row md:justify-between gap-2">
+          <div className="flex flex-wrap gap-2">
+            {/* MONTH */}
+            <div className="flex items-center gap-1 border border-[var(--border-color)] px-2 py-1 rounded-md">
+              <FaCalendarAlt className="text-xs text-gray-400" />
+
+              <select
+                value={month}
+                onChange={(e) => setMonth(e.target.value)}
+                className="bg-[var(--bg-surface)] text-[var(--text-primary)] outline-none text-sm"
+              >
                 {Array.from({ length: 12 }, (_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {new Date(0, i).toLocaleString("default", { month: "long" })}
+                  <option
+                    key={i}
+                    value={i + 1}
+                    className="bg-[var(--bg-surface)] text-[var(--text-primary)]"
+                  >
+                    {new Date(0, i).toLocaleString("default", {
+                      month: "short",
+                    })}
                   </option>
                 ))}
-              </Select>
-            </InputGroup>
+              </select>
+            </div>
 
-            <InputGroup>
-              <Select value={year} onChange={(e) => setYear(e.target.value)}>
+            {/* YEAR */}
+            <div className="border border-[var(--border-color)] px-2 py-1 rounded-md">
+              <select
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                className="bg-[var(--bg-surface)] text-[var(--text-primary)] outline-none text-sm"
+              >
                 {Array.from({ length: 10 }, (_, i) => {
                   const y = new Date().getFullYear() - i;
                   return (
-                    <option key={y} value={y}>{y}</option>
+                    <option
+                      key={y}
+                      value={y}
+                      className="bg-[var(--bg-surface)] text-[var(--text-primary)]"
+                    >
+                      {y}
+                    </option>
                   );
                 })}
-              </Select>
-            </InputGroup>
+              </select>
+            </div>
 
-            <InputGroup>
-              <label><FaFilter /></label>
-              <Select
+            {/* CATEGORY */}
+            <div className="flex items-center gap-1 border border-[var(--border-color)] px-2 py-1 rounded-md">
+              <FaFilter className="text-xs text-gray-400" />
+
+              <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
+                className="bg-[var(--bg-surface)] text-[var(--text-primary)] outline-none text-sm"
               >
-                <option value="">All Categories</option>
+                <option
+                  value=""
+                  className="bg-[var(--bg-surface)] text-[var(--text-primary)]"
+                >
+                  All
+                </option>
+
                 {categories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
+                  <option
+                    key={cat}
+                    className="bg-[var(--bg-surface)] text-[var(--text-primary)]"
+                  >
+                    {cat}
+                  </option>
                 ))}
-              </Select>
-            </InputGroup>
+              </select>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <InputGroup>
-              <label><FaSearch /></label>
-              <SearchInput
+          {/* SEARCH + EXPORT */}
+          <div className="flex flex-wrap gap-2 items-center">
+            <div className="flex items-center gap-1 border border-[var(--border-color)] px-2 py-1 rounded-md">
+              <FaSearch className="text-xs text-gray-400" />
+
+              <input
                 type="text"
-                placeholder="Search expenses..."
+                placeholder="Search"
+                className="bg-transparent outline-none text-sm w-28 text-[var(--text-primary)]"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-            </InputGroup>
+            </div>
 
-            <ExportButtons>
-              <ExportButton
-                type="pdf"
-                onClick={() => downloadExpensesPDF(filteredExpenses, month, year)}
-              >
-                <FaFilePdf />
-              </ExportButton>
-              <ExportButton
-                type="excel"
-                onClick={() => downloadExpensesExcel(filteredExpenses, month, year)}
-              >
-                <FaFileExcel />
-              </ExportButton>
-            </ExportButtons>
+            <button
+              onClick={() => downloadExpensesPDF(filteredExpenses, month, year)}
+              className="flex items-center justify-center w-8 h-8 rounded-md bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition"
+            >
+              <FaFilePdf className="text-sm" />
+            </button>
+
+            <button
+              onClick={() =>
+                downloadExpensesExcel(filteredExpenses, month, year)
+              }
+              className="flex items-center justify-center w-8 h-8 rounded-md bg-green-100 text-green-600 hover:bg-green-600 hover:text-white transition"
+            >
+              <FaFileExcel className="text-sm" />
+            </button>
           </div>
-        </FilterSection>
+        </div>
 
+        {/* ERROR */}
         {error && (
-          <GlassCard style={{ color: 'var(--color-red-700)', textAlign: 'center' }}>
-            {error}
-          </GlassCard>
+          <div className="text-center text-red-500 text-sm mb-3">{error}</div>
         )}
 
-        <ExpenseList>
+        {/* LIST */}
+        <div className="space-y-2 max-h-[55vh] overflow-y-auto">
           {paginatedExpenses.length > 0 ? (
-            paginatedExpenses.map((expense, index) => (
-              <ExpenseItem key={expense._id} index={index}>
-                <ItemInfo>
-                  <h3>{expense.expenseName}</h3>
-                  <span>
-                    {new Date(expense.date).toLocaleDateString(undefined, { 
-                      year: 'numeric', month: 'short', day: 'numeric' 
-                    })} 
-                    <span style={{ margin: '0 8px', opacity: 0.3 }}>|</span> 
+            paginatedExpenses.map((expense) => (
+              <div
+                key={expense._id}
+                className="flex items-center justify-between p-3 rounded-lg border border-[var(--border-color)] bg-[var(--bg-surface)] hover:shadow-sm transition"
+              >
+                <div>
+                  <h3 className="text-sm font-medium text-[var(--text-primary)]">
+                    {expense.expenseName}
+                  </h3>
+
+                  <p className="text-xs text-[var(--text-secondary)]">
+                    {new Date(expense.date).toLocaleDateString()} •{" "}
                     {expense.expenseType} • {expense.issuedTo}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-indigo-500">
+                    ₹{expense.amount.toFixed(2)}
                   </span>
-                </ItemInfo>
 
-                <Amount>₹{expense.amount.toFixed(2)}</Amount>
+                  <button
+                    onClick={() => handleEdit(expense._id)}
+                    className="p-1.5 rounded-md hover:bg-indigo-100 text-indigo-600"
+                  >
+                    <FaEdit className="text-xs" />
+                  </button>
 
-                <ActionIcons>
-                  <IconButton onClick={() => handleEdit(expense._id)}>
-                    <FaEdit />
-                  </IconButton>
-                  <IconButton className="delete" onClick={() => deleteExpense(expense._id)}>
-                    <FaTrash />
-                  </IconButton>
-                </ActionIcons>
-              </ExpenseItem>
+                  <button
+                    onClick={() => deleteExpense(expense._id)}
+                    className="p-1.5 rounded-md hover:bg-red-100 text-red-600"
+                  >
+                    <FaTrash className="text-xs" />
+                  </button>
+                </div>
+              </div>
             ))
           ) : (
-            <GlassCard style={{ textAlign: 'center', color: 'var(--color-grey-400)' }}>
-              {expenses.length === 0
-                ? "No expenses found for this period."
-                : "No expenses match the current filters."}
-            </GlassCard>
+            <div className="text-center text-sm text-[var(--text-secondary)] py-8">
+              No expenses found
+            </div>
           )}
-        </ExpenseList>
+        </div>
 
+        {/* PAGINATION */}
         {totalPages > 1 && (
-          <PaginationWrapper>
-            <PageButton
+          <div className="flex justify-center gap-1 mt-4 text-sm">
+            <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => p - 1)}
+              className="px-2 py-1 border rounded disabled:opacity-40"
             >
               Prev
-            </PageButton>
+            </button>
 
             {Array.from({ length: totalPages }, (_, i) => (
-              <PageButton
+              <button
                 key={i}
-                active={currentPage === i + 1}
                 onClick={() => setCurrentPage(i + 1)}
+                className={`px-2 py-1 rounded border ${
+                  currentPage === i + 1 ? "bg-indigo-500 text-white" : ""
+                }`}
               >
                 {i + 1}
-              </PageButton>
+              </button>
             ))}
 
-            <PageButton
+            <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => p + 1)}
+              className="px-2 py-1 border rounded disabled:opacity-40"
             >
               Next
-            </PageButton>
-          </PaginationWrapper>
+            </button>
+          </div>
         )}
-      </ContentWrapper>
-    </PageContainer>
+      </div>
+    </div>
   );
 };
 

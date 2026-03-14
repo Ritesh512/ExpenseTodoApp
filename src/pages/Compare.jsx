@@ -2,92 +2,9 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Chart from "react-apexcharts";
 import Summary from "../ui/Summary";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import checkAuth from "../api/checkauth";
-
-const CompareContainer = styled.div`
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-
-  @media (max-width: 768px) {
-    padding: 15px;
-    max-width: 100%; /* Full width on smaller screens */
-  }
-
-  @media (max-width: 480px) {
-    padding: 10px;
-  }
-`;
-
-const Dropdown = styled.select`
-  width: 200px;
-  padding: 10px;
-  margin: 10px 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
-
-  &:focus {
-    border-color: #4caf50;
-    outline: none;
-  }
-
-  @media (max-width: 768px) {
-    width: 150px; /* Adjust width for mobile */
-    margin: 10px;
-  }
-
-  @media (max-width: 480px) {
-    width: 120px; /* Further reduce width for very small screens */
-    font-size: 14px;
-  }
-`;
-
-const ChartContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  margin-bottom: 20px;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: center;
-  }
-`;
-
-const Card = styled.div`
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 450px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-
-  @media (max-width: 768px) {
-    width: 90%; /* Adjust width for smaller screens */
-    margin-bottom: 15px;
-  }
-
-  @media (max-width: 480px) {
-    width: 100%; /* Full width for very small screens */
-  }
-`;
-
-const ChartTitle = styled.h4`
-  text-align: center;
-  margin-bottom: 15px;
-  font-size: 18px;
-  color: #333;
-
-  @media (max-width: 768px) {
-    font-size: 16px; /* Adjust font size for mobile */
-  }
-`;
 
 const months = [
   { name: "January", value: 1 },
@@ -128,27 +45,27 @@ const Compare = () => {
       setWindowWidth(window.innerWidth);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const fetchData = async () => {
     try {
-      const token = JSON.parse(localStorage.getItem("token"));
+      const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:3000/api/expenses/filter/two-months?month1=${month1.value}&year1=${year1}&month2=${month2.value}&year2=${year2}`,
+        `https://expense-todo-five.vercel.app/api/expenses/filter/two-months?month1=${month1.value}&year1=${year1}&month2=${month2.value}&year2=${year2}`,
         {
           headers: {
             "Content-Type": "application/json",
             authorization: `bearer ${token}`,
           },
-        }
+        },
       );
       const isAuthValid = await checkAuth(response);
-        if (!isAuthValid) {
-            navigate("/login");
-            return;
-        }
+      if (!isAuthValid) {
+        navigate("/login");
+        return;
+      }
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
@@ -177,7 +94,7 @@ const Compare = () => {
     dataLabels: {
       enabled: true,
       style: {
-        fontSize: '12px',
+        fontSize: "12px",
       },
       dropShadow: {
         enabled: false,
@@ -191,11 +108,11 @@ const Compare = () => {
       "#008FFB", // Blue
       "#00D9E9", // Teal
       "#FF66C3", // Pink
-      "#D4AC2B",  // Gold
+      "#D4AC2B", // Gold
     ],
     legend: {
       position: "bottom",
-      fontSize: '12px',
+      fontSize: "12px",
       markers: {
         width: 8,
         height: 8,
@@ -221,7 +138,7 @@ const Compare = () => {
         options: {
           legend: {
             position: "bottom",
-            fontSize: '11px',
+            fontSize: "11px",
             itemMargin: {
               horizontal: 6,
               vertical: 3,
@@ -244,7 +161,7 @@ const Compare = () => {
         options: {
           legend: {
             position: "bottom",
-            fontSize: '10px',
+            fontSize: "10px",
             itemMargin: {
               horizontal: 4,
               vertical: 2,
@@ -272,7 +189,9 @@ const Compare = () => {
     // Calculate category differences
     const categoryDifferences = [
       ...chartData1.map((item) => {
-        const match = chartData2.find((data) => data.expenseType === item.expenseType);
+        const match = chartData2.find(
+          (data) => data.expenseType === item.expenseType,
+        );
         return {
           expenseType: item.expenseType,
           amount1: item.amount,
@@ -281,7 +200,10 @@ const Compare = () => {
         };
       }),
       ...chartData2
-        .filter((item) => !chartData1.find((data) => data.expenseType === item.expenseType))
+        .filter(
+          (item) =>
+            !chartData1.find((data) => data.expenseType === item.expenseType),
+        )
         .map((item) => ({
           expenseType: item.expenseType,
           amount1: 0,
@@ -290,12 +212,15 @@ const Compare = () => {
         })),
     ].sort((a, b) => Math.abs(b.difference) - Math.abs(a.difference)); // Sort by absolute difference
 
-    const topExpenseDiff = categoryDifferences.length > 0 ? categoryDifferences[0] : {
-      expenseType: "None",
-      difference: 0,
-      amount1: 0,
-      amount2: 0
-    };
+    const topExpenseDiff =
+      categoryDifferences.length > 0
+        ? categoryDifferences[0]
+        : {
+            expenseType: "None",
+            difference: 0,
+            amount1: 0,
+            amount2: 0,
+          };
 
     // Calculate additional metrics
     const categoryCount1 = chartData1.length;
@@ -308,7 +233,7 @@ const Compare = () => {
         expenseType: topExpenseDiff.expenseType,
         amountDiff: topExpenseDiff.difference,
         amount1: topExpenseDiff.amount1,
-        amount2: topExpenseDiff.amount2
+        amount2: topExpenseDiff.amount2,
       },
       categoryDifferences: categoryDifferences.slice(0, 5), // Top 5 category differences
       categoryCount1,
@@ -317,122 +242,181 @@ const Compare = () => {
   };
 
   return (
-    <CompareContainer>
-      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-        <div>
-          <h3>Chart 1</h3>
-          <Dropdown
-            value={month1.value}
-            onChange={(e) => {
-              const selectedMonth = months.find(
-                (month) => month.value === parseInt(e.target.value)
-              );
-              setMonth1(selectedMonth);
-            }}
-          >
-            {months.map((month) => (
-              <option key={month.value} value={month.value}>
-                {month.name}
-              </option>
-            ))}
-          </Dropdown>
-          <Dropdown
-            value={year1}
-            onChange={(e) => setYear1(parseInt(e.target.value))}
-          >
-            {Array.from({ length: 10 }, (_, i) => {
-              const currentYear = new Date().getFullYear();
-              const yearOption = currentYear - i;
-              return (
-                <option key={yearOption} value={yearOption}>
-                  {yearOption}
+    <div className="max-w-6xl mx-auto px-0 py-0">
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 mt-2 gap-3">
+        <h1 className="text-lg font-semibold text-[var(--text-primary)]">
+          Expense Comparison
+        </h1>
+      </div>
+
+      {/* SELECTORS */}
+      <div className="grid md:grid-cols-2 gap-4 mb-6">
+        {/* MONTH 1 */}
+        <div className="bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-lg p-4">
+          <h3 className="text-sm font-medium text-[var(--text-primary)] mb-3">
+            Chart 1
+          </h3>
+
+          <div className="flex gap-3 flex-wrap">
+            <select
+              className="input"
+              value={month1.value}
+              onChange={(e) => {
+                const selectedMonth = months.find(
+                  (m) => m.value === parseInt(e.target.value),
+                );
+                setMonth1(selectedMonth);
+              }}
+            >
+              {months.map((month) => (
+                <option key={month.value} value={month.value}>
+                  {month.name}
                 </option>
-              );
-            })}
-          </Dropdown>
+              ))}
+            </select>
+
+            <select
+              className="input"
+              value={year1}
+              onChange={(e) => setYear1(parseInt(e.target.value))}
+            >
+              {Array.from({ length: 10 }, (_, i) => {
+                const yearOption = new Date().getFullYear() - i;
+                return (
+                  <option key={yearOption} value={yearOption}>
+                    {yearOption}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
         </div>
-        <div>
-          <h3>Chart 2</h3>
-          <Dropdown
-            value={month2.value}
-            onChange={(e) => {
-              const selectedMonth = months.find(
-                (month) => month.value === parseInt(e.target.value)
-              );
-              setMonth2(selectedMonth);
-            }}
-          >
-            {months.map((month) => (
-              <option key={month.value} value={month.value}>
-                {month.name}
-              </option>
-            ))}
-          </Dropdown>
-          <Dropdown
-            value={year2}
-            onChange={(e) => setYear2(parseInt(e.target.value))}
-          >
-            {Array.from({ length: 10 }, (_, i) => {
-              const currentYear = new Date().getFullYear();
-              const yearOption = currentYear - i;
-              return (
-                <option key={yearOption} value={yearOption}>
-                  {yearOption}
+
+        {/* MONTH 2 */}
+        <div className="bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-lg p-4">
+          <h3 className="text-sm font-medium text-[var(--text-primary)] mb-3">
+            Chart 2
+          </h3>
+
+          <div className="flex gap-3 flex-wrap">
+            <select
+              className="input"
+              value={month2.value}
+              onChange={(e) => {
+                const selectedMonth = months.find(
+                  (m) => m.value === parseInt(e.target.value),
+                );
+                setMonth2(selectedMonth);
+              }}
+            >
+              {months.map((month) => (
+                <option key={month.value} value={month.value}>
+                  {month.name}
                 </option>
-              );
-            })}
-          </Dropdown>
+              ))}
+            </select>
+
+            <select
+              className="input"
+              value={year2}
+              onChange={(e) => setYear2(parseInt(e.target.value))}
+            >
+              {Array.from({ length: 10 }, (_, i) => {
+                const yearOption = new Date().getFullYear() - i;
+                return (
+                  <option key={yearOption} value={yearOption}>
+                    {yearOption}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
         </div>
       </div>
 
-      <ChartContainer>
-        <Card>
-          <div>
-            <ChartTitle>{month1.name} {year1}</ChartTitle>
-            {
-              chartData1.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "20px", color: "#888" }}>
-                  No data available
-                </div>
-              ) : (
-                <Chart
-                  options={{ ...chartOptions, labels: prepareChartData(chartData1).labels }}
-                  series={prepareChartData(chartData1).series}
-                  type="donut"
-                  width={windowWidth < 768 ? "100%" : "400"}
-                  height={windowWidth < 768 ? "300" : "400"}
-                />
-              )
-            }
-          </div>
-        </Card>
-        <Card>
-          <div>
-            <ChartTitle>{month2.name} {year2}</ChartTitle>
-            {
-              chartData2.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "20px", color: "#888" }}>
-                  No data available
-                </div>
-              ) : (
-                <Chart
-                  options={{ ...chartOptions, labels: prepareChartData(chartData2).labels }}
-                  series={prepareChartData(chartData2).series}
-                  type="donut"
-                  width={windowWidth < 768 ? "100%" : "400"}
-                  height={windowWidth < 768 ? "300" : "400"}
-                />
-              )
-            }
-          </div>
-        </Card>
-      </ChartContainer>
+      {/* CHARTS */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* CHART 1 */}
+        <div className="bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-xl p-4 flex flex-col items-center">
+          <h4 className="text-sm font-medium mb-4 text-[var(--text-primary)]">
+            {month1.name} {year1}
+          </h4>
 
-      {
-        chartData2.length > 0 && <Summary summary={computeSummary()} month1Name={month1.name} month2Name={month2.name} year1={year1} year2={year2} />
-      }
+          {chartData1.length === 0 ? (
+            <p className="text-xs text-[var(--text-secondary)]">
+              No data available
+            </p>
+          ) : (
+            <Chart
+              options={{
+                ...chartOptions,
+                labels: prepareChartData(chartData1).labels,
+              }}
+              series={prepareChartData(chartData1).series}
+              type="donut"
+              width="100%"
+              height="320"
+            />
+          )}
+        </div>
 
-    </CompareContainer>
+        {/* CHART 2 */}
+        <div className="bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-xl p-4 flex flex-col items-center">
+          <h4 className="text-sm font-medium mb-4 text-[var(--text-primary)]">
+            {month2.name} {year2}
+          </h4>
+
+          {chartData2.length === 0 ? (
+            <p className="text-xs text-[var(--text-secondary)]">
+              No data available
+            </p>
+          ) : (
+            <Chart
+              options={{
+                ...chartOptions,
+                labels: prepareChartData(chartData2).labels,
+              }}
+              series={prepareChartData(chartData2).series}
+              type="donut"
+              width="100%"
+              height="320"
+            />
+          )}
+        </div>
+      </div>
+
+      {/* SUMMARY */}
+      {chartData2.length > 0 && (
+        <div className="mt-6">
+          <Summary
+            summary={computeSummary()}
+            month1Name={month1.name}
+            month2Name={month2.name}
+            year1={year1}
+            year2={year2}
+          />
+        </div>
+      )}
+
+      {/* INPUT STYLE */}
+      <style jsx>{`
+        .input {
+          padding: 6px 10px;
+          font-size: 13px;
+          border-radius: 6px;
+          border: 1px solid var(--border-color);
+          background: var(--bg-main);
+          color: var(--text-primary);
+          outline: none;
+          min-width: 120px;
+        }
+
+        .input:focus {
+          border-color: #6366f1;
+        }
+      `}</style>
+    </div>
   );
 };
 

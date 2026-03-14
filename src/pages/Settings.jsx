@@ -1,145 +1,147 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import styled from 'styled-components';
-
-const Container = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f4f4f4;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-`;
-
-const Section = styled.div`
-  margin-bottom: 20px;
-`;
-
-const Row = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const Label = styled.label`
-  flex: 1;
-  margin-right: 20px;
-  font-weight: bold;
-`;
-
-const Value = styled.p`
-  flex: 2;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 8px;
-  font-size: 16px;
-  margin:10px
-`;
-
-const Button = styled.button`
-  background-color: #4caf50;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #45a049;
-  }
-`;
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Settings = () => {
-  const auth = JSON.parse(localStorage.getItem("user"));
-  const [name, setName] = useState(auth.username);
-  const [email, setEmail] = useState(auth.email);
-  const [password, setPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const auth = JSON.parse(localStorage.getItem("user") || "{}");
+
+  const [name] = useState(auth.username);
+  const [email] = useState(auth.email);
+  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+
   const navigate = useNavigate();
 
   const handleChangePassword = async () => {
-    if(newPassword!==confirmNewPassword){
-      toast.warning("Password and confirm Password is not same", {
-        position: toast.POSITION.TOP_RIGHT,
-      });
-      return ;
+    if (newPassword !== confirmNewPassword) {
+      toast.warning("Passwords do not match");
+      return;
     }
+
     try {
-      const userId = auth._id; 
-      const role = auth.role;
-      const response = await fetch('http://localhost:3000/api/users/changePassword', {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-          authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
+      const response = await fetch(
+        "https://expense-todo-five.vercel.app/api/users/changePassword",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            userId: auth._id,
+            password,
+            newPassword,
+            role: auth.role,
+          }),
         },
-        body: JSON.stringify({
-          userId,
-          password,
-          newPassword,
-          role,
-        }),
-      });
+      );
 
       if (!response.ok) {
         const data = await response.json();
-        console.error('Error changing password:', data.error);
+        toast.error(data.error || "Error changing password");
       } else {
-        console.log('Password changed successfully');
-        toast.success("Password changed successfully", {
-          position: toast.POSITION.TOP_RIGHT,
-        });
+        toast.success("Password changed successfully");
         navigate("/");
       }
     } catch (error) {
-      console.error('Error changing password:', error);
+      console.error(error);
+      toast.error("Something went wrong");
     }
   };
 
   return (
-    <Container>
-      <Section>
-        <Row>
-          <Label>Name:</Label>
-          <Value>{name}</Value>
-        </Row>
-        <Row>
-          <Label>Email:</Label>
-          <Value>{email}</Value>
-        </Row>
-      </Section>
-      <Section>
-        <h2>Change Password</h2>
-        <Input
-          type="password"
-          placeholder="Current Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <Input
-          type="password"
-          placeholder="New Password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-        />
-        <Input
-          type="password"
-          placeholder="Confirm New Password"
-          value={confirmNewPassword}
-          onChange={(e) => setConfirmNewPassword(e.target.value)}
-        />
-        <Button onClick={handleChangePassword}>Change Password</Button>
-      </Section>
-    </Container>
+    <div
+      className="w-full max-w-2xl mx-auto p-4 sm:p-6 space-y-6"
+      style={{ background: "var(--bg-main)", color: "var(--text-primary)" }}
+    >
+      {/* PROFILE INFO */}
+
+      <div
+        className="rounded-lg p-4 sm:p-5"
+        style={{
+          background: "var(--bg-surface)",
+          border: "1px solid var(--border-color)",
+        }}
+      >
+        <h2 className="text-lg font-semibold mb-4">Profile</h2>
+
+        <div className="space-y-3 text-sm">
+          <InfoRow label="Name" value={name} />
+          <InfoRow label="Email" value={email} />
+        </div>
+      </div>
+
+      {/* CHANGE PASSWORD */}
+
+      <div
+        className="rounded-lg p-4 sm:p-5"
+        style={{
+          background: "var(--bg-surface)",
+          border: "1px solid var(--border-color)",
+        }}
+      >
+        <h2 className="text-lg font-semibold mb-4">Change Password</h2>
+
+        <div className="space-y-3">
+          <Input
+            type="password"
+            placeholder="Current Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <Input
+            type="password"
+            placeholder="New Password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+
+          <Input
+            type="password"
+            placeholder="Confirm New Password"
+            value={confirmNewPassword}
+            onChange={(e) => setConfirmNewPassword(e.target.value)}
+          />
+
+          <button
+            onClick={handleChangePassword}
+            className="w-full py-2.5 rounded-md font-semibold text-white transition"
+            style={{ background: "var(--color-brand-500)" }}
+          >
+            Change Password
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
+
+/* Reusable info row */
+
+const InfoRow = ({ label, value }) => (
+  <div
+    className="flex justify-between border-b pb-2"
+    style={{ borderColor: "var(--border-color)" }}
+  >
+    <span style={{ color: "var(--text-secondary)" }}>{label}</span>
+    <span className="font-medium">{value}</span>
+  </div>
+);
+
+/* Reusable input */
+
+const Input = ({ ...props }) => (
+  <input
+    {...props}
+    className="w-full px-3 py-2 rounded-md text-sm outline-none transition"
+    style={{
+      background: "var(--bg-main)",
+      border: "1px solid var(--border-color)",
+      color: "var(--text-primary)",
+    }}
+  />
+);
 
 export default Settings;

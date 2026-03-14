@@ -1,110 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect } from "react";
 
-const FormContainer = styled.div`
-  padding: 30px;
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  max-width: 500px;
-  margin: 20px auto;
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-lg);
-
-  @media (max-width: 768px) {
-    padding: 20px;
-    margin: 10px;
-    max-width: 100%;
-  }
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  label {
-    font-size: 1.3rem;
-    color: var(--color-grey-400);
-    font-weight: 500;
-    margin-left: 4px;
-  }
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--border-radius-md);
-  color: var(--color-grey-800);
-  font-size: 1.6rem;
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: var(--color-brand-500);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-  }
-
-  &::placeholder {
-    color: var(--color-grey-400);
-  }
-`;
-
-const Button = styled.button`
-  width: 100%;
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-  color: white;
-  padding: 14px;
-  font-size: 1.6rem;
-  font-weight: 600;
-  border: none;
-  border-radius: var(--border-radius-md);
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  margin-top: 10px;
-  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
-    filter: brightness(1.1);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-`;
-
-const predefinedTypes = ["Retail", "Electronic", "Food", "Travel", "Utilities", "Gold", "SIP", "Medicine"];
+const predefinedTypes = [
+  "Retail",
+  "Electronic",
+  "Food",
+  "Travel",
+  "Utilities",
+  "Gold",
+  "SIP",
+  "Medicine",
+];
 
 const ExpenseForm = ({ initialData = {}, onSubmit, submitButtonText }) => {
-  const [expenseName, setExpenseName] = useState(initialData.expenseName || '');
-  const [expenseType, setExpenseType] = useState(initialData.expenseType || '');
-  const [customExpenseType, setCustomExpenseType] = useState('');
-  
-  const getTodayDate = () => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  };
-  
+  const [expenseName, setExpenseName] = useState(initialData.expenseName || "");
+  const [expenseType, setExpenseType] = useState(initialData.expenseType || "");
+  const [customExpenseType, setCustomExpenseType] = useState("");
+
+  const getTodayDate = () => new Date().toISOString().split("T")[0];
+
   const [date, setDate] = useState(initialData.date || getTodayDate());
-  const [issuedTo, setIssuedTo] = useState(initialData.issuedTo || '');
-  const [amount, setAmount] = useState(initialData.amount || '');
+  const [issuedTo, setIssuedTo] = useState(initialData.issuedTo || "");
+  const [amount, setAmount] = useState(initialData.amount || "");
 
   useEffect(() => {
     if (initialData._id) {
       setExpenseName(initialData.expenseName);
-      if (initialData.expenseType && !predefinedTypes.includes(initialData.expenseType)) {
-        setExpenseType('Other');
+
+      if (
+        initialData.expenseType &&
+        !predefinedTypes.includes(initialData.expenseType)
+      ) {
+        setExpenseType("Other");
         setCustomExpenseType(initialData.expenseType);
       } else {
-        setExpenseType(initialData.expenseType || 'Retail');
+        setExpenseType(initialData.expenseType || "Retail");
       }
+
       setDate(initialData.date);
       setIssuedTo(initialData.issuedTo);
       setAmount(initialData.amount);
@@ -113,14 +44,15 @@ const ExpenseForm = ({ initialData = {}, onSubmit, submitButtonText }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const rawType = expenseType === 'Other'
-      ? (customExpenseType || 'Other')
-      : expenseType;
+
+    const rawType =
+      expenseType === "Other" ? customExpenseType || "Other" : expenseType;
 
     const normalized = String(rawType).trim();
+
     const formattedType = normalized
       ? normalized.charAt(0).toUpperCase() + normalized.slice(1)
-      : 'Other';
+      : "Other";
 
     const expenseData = {
       expenseName,
@@ -129,87 +61,135 @@ const ExpenseForm = ({ initialData = {}, onSubmit, submitButtonText }) => {
       issuedTo,
       amount,
     };
+
     onSubmit(expenseData);
   };
 
   return (
-    <FormContainer>
-      <form onSubmit={handleSubmit}>
-        <FormGroup>
-          <label>Expense Name</label>
+    <div
+      className="w-full max-w-lg mx-auto p-4 sm:p-6 rounded-xl shadow-md"
+      style={{
+        background: "var(--bg-surface)",
+        border: "1px solid var(--border-color)",
+      }}
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Expense Name */}
+        <FormField label="Expense Name">
           <Input
             type="text"
             placeholder="e.g. Monthly Grocery"
             value={expenseName}
             onChange={(e) => setExpenseName(e.target.value)}
-            required
           />
-        </FormGroup>
+        </FormField>
 
-        <FormGroup>
-          <label>Category</label>
+        {/* Category */}
+        <FormField label="Category">
           <Input
             type="text"
             list="expense-types"
             placeholder="Select or type..."
-            value={expenseType === 'Other' && customExpenseType ? customExpenseType : expenseType}
+            value={
+              expenseType === "Other" && customExpenseType
+                ? customExpenseType
+                : expenseType
+            }
             onChange={(e) => {
               const v = e.target.value;
-              if (v === 'Other') {
-                setExpenseType('Other');
-                setCustomExpenseType('');
+
+              if (v === "Other") {
+                setExpenseType("Other");
+                setCustomExpenseType("");
               } else if (predefinedTypes.includes(v)) {
                 setExpenseType(v);
-                setCustomExpenseType('');
+                setCustomExpenseType("");
               } else {
                 setExpenseType(v);
                 setCustomExpenseType(v);
               }
             }}
-            required
           />
+
           <datalist id="expense-types">
-            {predefinedTypes.map(type => <option key={type} value={type} />)}
+            {predefinedTypes.map((type) => (
+              <option key={type} value={type} />
+            ))}
             <option value="Other" />
           </datalist>
-        </FormGroup>
+        </FormField>
 
-        <FormGroup>
-          <label>Date</label>
+        {/* Date */}
+        <FormField label="Date">
           <Input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            required
           />
-        </FormGroup>
+        </FormField>
 
-        <FormGroup>
-          <label>Issued To</label>
+        {/* Issued To */}
+        <FormField label="Issued To">
           <Input
             type="text"
             placeholder="e.g. Amazon, Local Shop"
             value={issuedTo}
             onChange={(e) => setIssuedTo(e.target.value)}
-            required
           />
-        </FormGroup>
+        </FormField>
 
-        <FormGroup>
-          <label>Amount (₹)</label>
+        {/* Amount */}
+        <FormField label="Amount (₹)">
           <Input
             type="number"
             placeholder="0.00"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            required
           />
-        </FormGroup>
+        </FormField>
 
-        <Button type="submit">{submitButtonText}</Button>
+        {/* Submit */}
+        <button
+          type="submit"
+          className="w-full py-2.5 rounded-lg font-semibold text-white transition-all duration-200"
+          style={{
+            background: "var(--color-brand-500)",
+          }}
+        >
+          {submitButtonText}
+        </button>
       </form>
-    </FormContainer>
+    </div>
   );
 };
+
+/* Reusable field wrapper */
+
+const FormField = ({ label, children }) => (
+  <div className="flex flex-col gap-1">
+    <label
+      className="text-sm font-medium"
+      style={{ color: "var(--text-secondary)" }}
+    >
+      {label}
+    </label>
+    {children}
+  </div>
+);
+
+/* Reusable input */
+
+const Input = (props) => (
+  <input
+    {...props}
+    required
+    className="w-full px-3 py-2 rounded-md text-sm border outline-none transition"
+    style={{
+      background: "var(--bg-main)",
+      border: "1px solid var(--border-color)",
+      color: "var(--text-primary)",
+    }}
+  />
+);
 
 export default ExpenseForm;

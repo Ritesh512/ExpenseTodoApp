@@ -1,133 +1,179 @@
-import React from 'react';
-import styled from 'styled-components';
-import Chart from 'react-apexcharts';
-
-const Card = styled.div`
-  background: var(--color-grey-0);
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-sm);
-  padding: 24px;
-  width: 100%;
-  max-width: 450px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-  }
-
-  @media (max-width: 768px) {
-    padding: 16px;
-    max-width: 100%;
-  }
-`;
-
-const Title = styled.h4`
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-  color: var(--color-grey-900);
-`;
-
-const FallbackMessage = styled.div`
-  text-align: center;
-  padding: 40px;
-  color: var(--color-grey-400);
-  font-size: 1.5rem;
-`;
+import React from "react";
+import Chart from "react-apexcharts";
 
 const GraphCard = ({ title, data, type }) => {
-  const isDarkMode = document.documentElement.getAttribute("data-theme") === "dark";
+  const isDarkMode =
+    document.documentElement.getAttribute("data-theme") === "dark";
 
   const transformData = () => {
     if (!data || data.length === 0) return null;
 
     const commonOptions = {
-      theme: {
-        mode: isDarkMode ? 'dark' : 'light',
-      },
       chart: {
-        background: 'transparent',
-        fontFamily: 'Poppins, sans-serif',
-        toolbar: { show: false }
+        background: "transparent",
+        fontFamily: "Poppins, sans-serif",
+        toolbar: { show: false },
       },
+
+      theme: {
+        mode: isDarkMode ? "dark" : "light",
+      },
+
       grid: {
-        borderColor: 'var(--glass-border)',
+        borderColor: "var(--border-color)",
         strokeDashArray: 4,
-      }
+      },
+
+      legend: {
+        labels: {
+          colors: "var(--text-primary)",
+        },
+      },
+
+      tooltip: {
+        theme: isDarkMode ? "dark" : "light",
+      },
     };
 
-    if (type === 'donut') {
+    if (type === "donut") {
       return {
         options: {
           ...commonOptions,
           labels: data.map((item) => item.category),
-          legend: { labels: { colors: 'var(--color-grey-600)' } }
         },
         series: data.map((item) => item.amount),
       };
     }
 
-    if (type === 'bar') {
-      const seriesData = data.map((item) => item.amount);
-      if (seriesData.some((amount) => isNaN(amount))) return null;
+    if (type === "bar") {
+      const seriesData = data.map((item) => Number(item.amount));
+
+      if (seriesData.some((v) => isNaN(v))) return null;
 
       return {
         options: {
           ...commonOptions,
+
           xaxis: {
             categories: data.map((item) => item.item),
-            labels: { style: { colors: 'var(--color-grey-500)' } }
+            labels: {
+              style: {
+                colors: "var(--text-primary)",
+                fontSize: "11px",
+              },
+            },
           },
+
           yaxis: {
-            labels: { 
-              style: { colors: 'var(--color-grey-500)' },
-              formatter: (val) => val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val
-            }
-          }
+            labels: {
+              style: {
+                colors: "var(--text-primary)",
+                fontSize: "11px",
+              },
+              formatter: (val) =>
+                val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val,
+            },
+          },
         },
-        series: [{ name: 'Spending', data: seriesData }],
+
+        series: [
+          {
+            name: "Spending",
+            data: seriesData,
+          },
+        ],
       };
     }
 
-    if (type === 'line') {
+    if (type === "line") {
       return {
         options: {
           ...commonOptions,
+
           xaxis: {
             categories: data.map((item) => item.date),
-            labels: { style: { colors: 'var(--color-grey-500)' } }
+            labels: {
+              style: {
+                colors: "var(--text-primary)",
+                fontSize: "11px",
+              },
+            },
           },
+
           yaxis: {
-            labels: { 
-              style: { colors: 'var(--color-grey-500)' },
-              formatter: (val) => val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val
-            }
-          }
+            labels: {
+              style: {
+                colors: "var(--text-primary)",
+                fontSize: "11px",
+              },
+              formatter: (val) =>
+                val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val,
+            },
+          },
         },
-        series: [{ name: 'Spending', data: data.map((item) => item.amount) }],
+
+        series: [
+          {
+            name: "Spending",
+            data: data.map((item) => item.amount),
+          },
+        ],
       };
     }
+
     return null;
   };
 
   const chartData = transformData();
 
   return (
-    <Card>
-      <Title>{title}</Title>
+    <div
+      className="
+        bg-[var(--bg-surface)]
+        border border-[var(--border-color)]
+        rounded-lg
+        shadow-sm
+        p-4
+        w-full
+        transition
+        hover:shadow-md
+        hover:-translate-y-[2px]
+      "
+    >
+      <h4
+        className="
+          text-sm
+          font-semibold
+          text-[var(--text-primary)]
+          mb-3
+        "
+      >
+        {title}
+      </h4>
+
       {chartData ? (
-        <Chart
-          options={chartData.options}
-          series={chartData.series}
-          type={type}
-          width="100%"  // Ensure the chart width is responsive
-        />
+        <div className="w-full overflow-hidden">
+          <Chart
+            options={chartData.options}
+            series={chartData.series}
+            type={type}
+            width="100%"
+            height={280}
+          />
+        </div>
       ) : (
-        <FallbackMessage>No data available</FallbackMessage>
+        <div
+          className="
+            text-center
+            py-8
+            text-sm
+            text-[var(--text-secondary)]
+          "
+        >
+          No data available
+        </div>
       )}
-    </Card>
+    </div>
   );
 };
 

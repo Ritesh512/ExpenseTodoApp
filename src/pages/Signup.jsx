@@ -1,145 +1,123 @@
 import React, { useState } from "react";
-import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
-import {  toast } from "react-toastify";
-
-const CenteredContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f4f4f4;
-`;
-
-const FormContainer = styled.div`
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  width: 350px;
-`;
-
-const Header = styled.h2`
-  background-color: #3498db;
-  color: #fff;
-  margin: 0;
-  padding: 20px;
-`;
-
-const SignupForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-`;
-
-const FormInput = styled.input`
-  margin-bottom: 15px;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-`;
-
-
-
-const SubmitButton = styled.button`
-  background-color: #3498db;
-  color: #fff;
-  padding: 10px;
-  font-size: 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #2980b9;
-  }
-`;
-
-const LoginLink = styled.p`
-  text-align: center;
-  margin-top: 15px;
-  font-size: 14px;
-  margin-bottom: 20px;
-
-  a {
-    color: #3498db;
-    text-decoration: underline;
-
-    &:hover {
-      color: #2980b9;
-    }
-  }
-`;
+import { toast } from "react-toastify";
+import expense from "../assets/images/expense1.jpg";
 
 const Signup = () => {
-  const [username, setUsername] = useState(""); // Step 1: Add name state
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const navigate = useNavigate();
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Signup clicked!");
-    // Add your signup logic here, including the 'name' field
-    const userData = {
-      username,
-      email,
-      password,
-    };
-    console.log(userData);
 
-    let result = await fetch("http://localhost:3000/api/users/signup",{
-            method:"post",
-            body:JSON.stringify(userData),
-            headers:{'Content-Type': 'application/json'}
-        });
-        result = await result.json();
-        console.warn(result);
-        if(result.status === 200){
-            toast.success("SignUp Successfully", {
-                position: "top-Right"
-              });
-        }else{
-          toast.warning(result.error, {
-            position: "top-Right"
-          });
-        }
-    navigate("/");
+    try {
+      const userData = {
+        username,
+        email,
+        password,
+      };
+
+      let result = await fetch(
+        "https://expense-todo-five.vercel.app/api/users/signup",
+        {
+          method: "POST",
+          body: JSON.stringify(userData),
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+
+      result = await result.json();
+
+      if (result.status === 200) {
+        toast.success("Signup Successfully");
+        navigate("/login");
+      } else {
+        toast.warning(result.error || "Signup failed");
+      }
+    } catch (error) {
+      toast.error("Network error. Please try again.");
+    }
   };
 
   return (
-    <CenteredContainer>
-      <FormContainer>
-        <Header>Signup</Header>
-        <SignupForm onSubmit={handleSubmit}>
-          <FormInput
-            type="text"
-            placeholder="Name"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <FormInput
-            type="text"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <FormInput
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          
-          <SubmitButton type="submit">Signup</SubmitButton>
-        </SignupForm>
-        <LoginLink>
-          Already have an account? <Link to="/login">Login</Link>
-        </LoginLink>
-      </FormContainer>
-    </CenteredContainer>
+    <div className="relative min-h-screen bg-blue-500 flex items-center justify-center">
+      {/* MOBILE BACKGROUND */}
+      <img
+        src={expense}
+        alt="background"
+        className="absolute inset-0 w-full h-full object-cover md:hidden"
+      />
+
+      {/* OVERLAY */}
+      <div className="absolute inset-0 bg-black/40 md:hidden"></div>
+
+      {/* DESKTOP IMAGE */}
+      <div className="hidden md:flex w-1/2 h-screen">
+        <img
+          src={expense}
+          alt="signup illustration"
+          className="object-cover w-full h-full"
+        />
+      </div>
+
+      {/* SIGNUP SECTION */}
+      <div className="relative flex flex-col justify-center items-center w-full md:w-1/2 px-6">
+        <div className="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-8">
+          <h2 className="text-3xl font-bold text-gray-800 text-center mb-6">
+            Create Account
+          </h2>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full border border-gray-300 text-black rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none"
+              required
+            />
+
+            <input
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full border border-gray-300 text-black rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none"
+              required
+            />
+
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full border border-gray-300 text-black rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none"
+              required
+            />
+
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition duration-200"
+            >
+              Sign Up
+            </button>
+          </form>
+
+          <p className="text-center text-gray-600 mt-6">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="text-indigo-600 hover:text-indigo-700 font-medium"
+            >
+              Login
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -1,544 +1,288 @@
 import React, { useState, useEffect } from "react";
-import styled from "styled-components";
 import { toast } from "react-toastify";
 import ReactMarkdown from "react-markdown";
-import { getAIAnalysis, getAIRecommendations, getAIForecast } from "../api/analysis";
-import { FaSpinner } from "react-icons/fa";
-
 import {
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    Tooltip,
-    ResponsiveContainer
+  getAIAnalysis,
+  getAIRecommendations,
+  getAIForecast,
+} from "../api/analysis";
+import { FaSpinner } from "react-icons/fa";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 
-/* ---------------- Layout ---------------- */
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  animation: fadeIn 0.5s ease-out;
-`;
-
-const TabsContainer = styled.div`
-  display: flex;
-  gap: 12px;
-  padding: 4px;
-  background: var(--color-bg-accent);
-  border-radius: var(--border-radius-md);
-  overflow-x: auto;
-  border: 1px solid var(--glass-border);
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
-
-const TabButton = styled.button`
-  padding: 10px 20px;
-  border-radius: var(--border-radius-sm);
-  background: ${p => p.active ? "var(--color-brand-600)" : "transparent"};
-  color: ${p => p.active ? "white" : "var(--color-grey-500)"};
-  font-weight: 600;
-  font-size: 1.4rem;
-  transition: all 0.3s;
-  white-space: nowrap;
-
-  &:hover {
-    color: ${p => p.active ? "white" : "var(--color-grey-900)"};
-    background: ${p => p.active ? "var(--color-brand-600)" : "var(--color-bg-card)"};
-  }
-`;
-
-const ContentBox = styled.div`
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--border-radius-lg);
-  padding: 30px;
-  min-height: 400px;
-  box-shadow: var(--shadow-md);
-
-  @media (max-width: 768px) {
-    padding: 20px;
-  }
-`;
-
-const Title = styled.h3`
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 20px;
-  margin-top: 30px;
-  color: var(--color-grey-900);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  &:first-child {
-    margin-top: 0;
-  }
-
-  &::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--glass-border);
-  }
-`;
-
-const SummaryGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
-`;
-
-const SummaryCard = styled.div`
-  background: linear-gradient(135deg, var(--color-brand-600) 0%, var(--color-brand-800) 100%);
-  color: white;
-  padding: 24px;
-  border-radius: var(--border-radius-md);
-  text-align: center;
-  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
-  transition: transform 0.3s;
-
-  &:hover {
-    transform: translateY(-4px);
-  }
-`;
-
-const SummaryLabel = styled.div`
-  font-size: 1.2rem;
-  opacity: 0.8;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-`;
-
-const SummaryValue = styled.div`
-  font-size: 2.4rem;
-  font-weight: 800;
-`;
-
-const CategoryList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
-const CategoryItem = styled.div`
-  background: var(--color-bg-accent);
-  padding: 20px;
-  border-radius: var(--border-radius-md);
-  border: 1px solid var(--glass-border);
-`;
-
-const CategoryName = styled.div`
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: var(--color-grey-900);
-  margin-bottom: 10px;
-`;
-
-const CategoryStats = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-`;
-
-const AmountString = styled.span`
-  font-weight: 700;
-  color: var(--color-brand-500);
-  font-size: 1.6rem;
-`;
-
-const PercentageString = styled.span`
-  color: var(--color-grey-500);
-  font-size: 1.4rem;
-`;
-
-const ProgressBar = styled.div`
-  height: 8px;
-  background: var(--color-grey-200);
-  border-radius: 4px;
-  overflow: hidden;
-`;
-
-const Progress = styled.div`
-  height: 100%;
-  background: linear-gradient(90deg, var(--color-brand-500), var(--color-brand-700));
-  width: ${p => p.percent}%;
-  transition: width 1s ease-out;
-`;
-
-const ExpenseCard = styled.div`
-  background: var(--color-bg-card);
-  padding: 16px 20px;
-  border-radius: var(--border-radius-md);
-  border-left: 4px solid var(--color-red-700);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: var(--shadow-sm);
-  
-  span:first-child {
-    font-weight: 600;
-    color: var(--color-grey-900);
-  }
-  
-  span:last-child {
-    color: var(--color-brand-600);
-    font-weight: 700;
-  }
-`;
-
-const AIBox = styled.div`
-  background: var(--color-bg-accent);
-  border: 1px solid var(--color-brand-100);
-  padding: 24px;
-  border-radius: var(--border-radius-lg);
-  font-size: 1.5rem;
-  line-height: 1.8;
-  color: var(--color-grey-800);
-
-  h1, h2, h3 {
-    margin-top: 20px;
-    margin-bottom: 10px;
-    color: var(--color-grey-900);
-  }
-
-  strong {
-    color: var(--color-brand-600);
-  }
-
-  ul, ol {
-    padding-left: 20px;
-    margin: 15px 0;
-  }
-
-  li {
-    margin-bottom: 10px;
-  }
-`;
-
-const AIBadge = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--color-brand-500);
-  color: white;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin-bottom: 15px;
-  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
-`;
-
-const Loading = styled.div`
-  text-align: center;
-  padding: 60px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-`;
-
-const SpinnerIcon = styled(FaSpinner)`
-  font-size: 4rem;
-  color: var(--color-brand-500);
-  animation: spin 1s linear infinite;
-
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-`;
-
-const LoadingText = styled.p`
-  color: var(--color-grey-500);
-  font-size: 1.6rem;
-  margin: 0;
-`;
-
-const ErrorMessage = styled.div`
-  background: ${p => p.isRateLimit ? "rgba(251, 191, 36, 0.1)" : "rgba(248, 113, 113, 0.1)"};
-  border: 1px solid ${p => p.isRateLimit ? "var(--color-yellow-700)" : "var(--color-red-700)"};
-  color: ${p => p.isRateLimit ? "var(--color-yellow-700)" : "var(--color-red-700)"};
-  padding: 20px;
-  border-radius: var(--border-radius-md);
-  margin: 20px 0;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-`;
-
-const ErrorIcon = styled.span`
-  font-size:20px;
-  flex-shrink:0;
-`;
-
-const ErrorContent = styled.div`
-  flex:1;
-  line-height:1.5;
-`;
-
-const ErrorTitle = styled.div`
-  font-weight:bold;
-  margin-bottom:4px;
-`;
-
-/* ---------------- Component ---------------- */
-
 const AIInsights = ({ dateRange, month, year }) => {
+  const [activeTab, setActiveTab] = useState("analysis");
+  const [analysis, setAnalysis] = useState(null);
+  const [recommend, setRecommend] = useState(null);
+  const [forecast, setForecast] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [isRateLimit, setIsRateLimit] = useState(false);
 
-    const [activeTab, setActiveTab] = useState("analysis");
-    const [analysis, setAnalysis] = useState(null);
-    const [recommend, setRecommend] = useState(null);
-    const [forecast, setForecast] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [isRateLimit, setIsRateLimit] = useState(false);
+  useEffect(() => {
+    fetchData("analysis");
+  }, []);
 
-    useEffect(() => {
-        fetchData("analysis");
-    }, []);
+  const fetchData = async (tab) => {
+    setLoading(true);
+    setError(null);
+    setIsRateLimit(false);
 
-    const fetchData = async (tab) => {
+    try {
+      if (tab === "analysis") {
+        const data = await getAIAnalysis(
+          dateRange.startDate,
+          dateRange.endDate,
+        );
+        setAnalysis(data);
+      }
 
-        setLoading(true);
-        setError(null);
-        setIsRateLimit(false);
+      if (tab === "recommendations") {
+        const data = await getAIRecommendations(month, year);
+        setRecommend(data);
+      }
 
-        try {
+      if (tab === "forecast") {
+        const data = await getAIForecast(2);
+        setForecast(data);
+      }
+    } catch (err) {
+      const limited =
+        err.message.includes("rate limit") ||
+        err.message.includes("Too many requests");
 
-            if (tab === "analysis") {
-                const data = await getAIAnalysis(dateRange.startDate, dateRange.endDate);
-                setAnalysis(data);
-            }
+      setIsRateLimit(limited);
+      setError(err.message);
+      toast.error(err.message);
+    }
 
-            if (tab === "recommendations") {
-                const data = await getAIRecommendations(month, year);
-                setRecommend(data);
-            }
+    setLoading(false);
+  };
 
-            if (tab === "forecast") {
-                const data = await getAIForecast(2);
-                setForecast(data);
-            }
+  const changeTab = (tab) => {
+    setActiveTab(tab);
+    fetchData(tab);
+  };
 
-        } catch (err) {
-            const isRateLimited = err.message.includes("rate limit") || err.message.includes("Too many requests");
-            setIsRateLimit(isRateLimited);
-            setError(err.message);
-            toast.error(err.message);
+  return (
+    <div className="flex flex-col gap-2">
+      {/* TABS */}
+      <div className="flex justify-between items-center p-0 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-md overflow-x-auto">
+        {[
+          ["analysis", "📊 Analysis"],
+          ["recommendations", "💡 Recommendations"],
+          ["forecast", "🔮 Forecast"],
+        ].map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => changeTab(key)}
+            className={`flex-1 text-center px-2 py-1.5 text-sm font-medium rounded-md whitespace-nowrap transition
+      ${
+        activeTab === key
+          ? "bg-indigo-500 text-white"
+          : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface)]"
+      }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* CONTENT */}
+      <div className="bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-lg p-4">
+        {/* LOADING */}
+        {loading && (
+          <div className="flex flex-col items-center py-10 gap-4">
+            <FaSpinner className="animate-spin text-indigo-500 text-3xl" />
+            <p className="text-sm text-[var(--text-secondary)]">
+              Loading AI insights...
+            </p>
+          </div>
+        )}
+
+        {/* ERROR */}
+        {error && (
+          <div
+            className={`p-4 rounded-md border text-sm ${
+              isRateLimit
+                ? "border-yellow-400 text-yellow-600"
+                : "border-red-400 text-red-500"
+            }`}
+          >
+            {error}
+          </div>
+        )}
+
+        {/* ANALYSIS */}
+        {!loading && activeTab === "analysis" && analysis && (
+          <>
+            <h3 className="section-title">Period Analysis</h3>
+
+            <div className="grid gap-3 sm:grid-cols-3 mb-5">
+              <div className="summary-card">
+                <span>Total Spending</span>
+                <strong>
+                  ₹{analysis.summary.totalSpending.toLocaleString()}
+                </strong>
+              </div>
+
+              <div className="summary-card">
+                <span>Transactions</span>
+                <strong>{analysis.summary.transactions}</strong>
+              </div>
+
+              <div className="summary-card">
+                <span>Avg Transaction</span>
+                <strong>
+                  ₹{analysis.summary.avgTransaction.toLocaleString()}
+                </strong>
+              </div>
+            </div>
+
+            <h3 className="section-title">Category Breakdown</h3>
+
+            <div className="flex flex-col gap-3">
+              {analysis.categoryBreakdown.slice(0, 10).map((c, i) => (
+                <div
+                  key={i}
+                  className="bg-[var(--bg-main)] border border-[var(--border-color)] rounded-md p-3"
+                >
+                  <div className="flex justify-between text-sm font-medium text-[var(--text-primary)]">
+                    <span>{c.category}</span>
+                    <span>₹{c.amount.toLocaleString()}</span>
+                  </div>
+
+                  <div className="h-2 bg-gray-200 rounded mt-2 overflow-hidden">
+                    <div
+                      className="h-full bg-indigo-500"
+                      style={{ width: `${c.percentage}%` }}
+                    />
+                  </div>
+
+                  <div className="text-xs text-[var(--text-secondary)] mt-1">
+                    {c.percentage}%
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <h3 className="section-title">Top Expenses</h3>
+
+            <div className="flex flex-col gap-2">
+              {analysis.topExpenses?.map((e, i) => (
+                <div
+                  key={i}
+                  className="flex justify-between bg-[var(--bg-main)] border border-[var(--border-color)] rounded-md p-3 text-sm"
+                >
+                  <span>{e.name}</span>
+                  <span className="font-semibold text-indigo-500">
+                    ₹{e.amount.toLocaleString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <h3 className="section-title">AI Analysis</h3>
+
+            <div className="bg-[var(--bg-main)] border border-[var(--border-color)] rounded-lg p-4 text-sm leading-relaxed">
+              <ReactMarkdown>{analysis.aiAnalysis}</ReactMarkdown>
+            </div>
+          </>
+        )}
+
+        {/* RECOMMENDATIONS */}
+        {!loading && activeTab === "recommendations" && recommend && (
+          <>
+            <h3 className="section-title">Monthly Recommendations</h3>
+
+            <div className="grid gap-3 sm:grid-cols-2 mb-5">
+              <div className="summary-card">
+                <span>Month</span>
+                <strong>{recommend.month}</strong>
+              </div>
+
+              <div className="summary-card">
+                <span>Total Spending</span>
+                <strong>₹{recommend.monthlySpending.toLocaleString()}</strong>
+              </div>
+            </div>
+
+            <div className="bg-[var(--bg-main)] border border-[var(--border-color)] rounded-lg p-4 text-sm">
+              <ReactMarkdown>{recommend.aiRecommendations}</ReactMarkdown>
+            </div>
+          </>
+        )}
+
+        {/* FORECAST */}
+        {!loading && activeTab === "forecast" && forecast && (
+          <>
+            <h3 className="section-title">Spending Trend</h3>
+
+            <ResponsiveContainer width="100%" height={240}>
+              <LineChart data={forecast.historicalData}>
+                <XAxis dataKey="month" stroke="var(--text-secondary)" />
+                <YAxis stroke="var(--text-secondary)" />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--bg-surface)",
+                    border: "1px solid var(--border-color)",
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="total"
+                  stroke="#6366f1"
+                  strokeWidth={3}
+                  dot={{ fill: "#6366f1" }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+
+            <h3 className="section-title">AI Forecast</h3>
+
+            <div className="bg-[var(--bg-main)] border border-[var(--border-color)] rounded-lg p-4 text-sm">
+              <ReactMarkdown>{forecast.aiForecast}</ReactMarkdown>
+            </div>
+          </>
+        )}
+      </div>
+
+      <style jsx>{`
+        .section-title {
+          font-size: 14px;
+          font-weight: 600;
+          margin-bottom: 12px;
+          color: var(--text-primary);
         }
 
-        setLoading(false);
-    };
+        .summary-card {
+          background: linear-gradient(135deg, #6366f1, #4f46e5);
+          color: white;
+          padding: 12px;
+          border-radius: 6px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          text-align: center;
+        }
 
-    const changeTab = (tab) => {
-        setActiveTab(tab);
-        fetchData(tab);
-    };
+        .summary-card span {
+          font-size: 11px;
+          opacity: 0.8;
+        }
 
-    return (
-        <Container>
-
-            <TabsContainer>
-
-                <TabButton active={activeTab === "analysis"} onClick={() => changeTab("analysis")}>
-                    📊 Analysis
-                </TabButton>
-
-                <TabButton active={activeTab === "recommendations"} onClick={() => changeTab("recommendations")}>
-                    💡 Recommendations
-                </TabButton>
-
-                <TabButton active={activeTab === "forecast"} onClick={() => changeTab("forecast")}>
-                    🔮 Forecast
-                </TabButton>
-
-            </TabsContainer>
-
-            <ContentBox>
-
-                {loading && <Loading>
-                    <SpinnerIcon />
-                    <LoadingText>Loading AI insights...</LoadingText>
-                </Loading>}
-
-                {error && (
-                    <ErrorMessage isRateLimit={isRateLimit}>
-                        <ErrorIcon>{isRateLimit ? "⏱️" : "⚠️"}</ErrorIcon>
-                        <ErrorContent>
-                            <ErrorTitle>{isRateLimit ? "Rate Limited" : "Error"}</ErrorTitle>
-                            <div>{error}</div>
-                        </ErrorContent>
-                    </ErrorMessage>
-                )}
-
-                {/* ---------- ANALYSIS ---------- */}
-
-                {!loading && activeTab === "analysis" && analysis && (
-
-                    <>
-                        <Title>Period Analysis</Title>
-
-                        <SummaryGrid>
-
-                            <SummaryCard>
-                                <SummaryLabel>Total Spending</SummaryLabel>
-                                <SummaryValue>₹{analysis.summary.totalSpending.toLocaleString()}</SummaryValue>
-                            </SummaryCard>
-
-                            <SummaryCard>
-                                <SummaryLabel>Transactions</SummaryLabel>
-                                <SummaryValue>{analysis.summary.transactions}</SummaryValue>
-                            </SummaryCard>
-
-                            <SummaryCard>
-                                <SummaryLabel>Avg Transaction</SummaryLabel>
-                                <SummaryValue>₹{analysis.summary.avgTransaction.toLocaleString()}</SummaryValue>
-                            </SummaryCard>
-
-                        </SummaryGrid>
-
-                        <Title>Category Breakdown</Title>
-
-                        <CategoryList>
-
-                            {analysis.categoryBreakdown.slice(0, 10).map((c, i) => (
-
-                                <CategoryItem key={i}>
-
-                                    <CategoryName>{c.category}</CategoryName>
-
-                                    <ProgressBar>
-                                        <Progress percent={c.percentage} />
-                                    </ProgressBar>
-
-                                    <CategoryStats>
-                                        <AmountString>₹{c.amount.toLocaleString()}</AmountString>
-                                        <PercentageString>{c.percentage}%</PercentageString>
-                                    </CategoryStats>
-
-                                </CategoryItem>
-
-                            ))}
-
-                        </CategoryList>
-
-                        <Title>Top Expenses</Title>
-
-                        <CategoryList>
-
-                            {analysis.topExpenses?.map((e, i) => (
-                                <ExpenseCard key={i}>
-                                    <span>{e.name}</span>
-                                    <span>₹{e.amount.toLocaleString()} ({e.category})</span>
-                                </ExpenseCard>
-                            ))}
-
-                        </CategoryList>
-
-                        <Title>AI Analysis</Title>
-
-                        <AIBox>
-
-                            <AIBadge>AI Generated Insight</AIBadge>
-
-                            <ReactMarkdown>
-                                {analysis.aiAnalysis}
-                            </ReactMarkdown>
-
-                        </AIBox>
-
-                    </>
-                )}
-
-                {/* ---------- RECOMMENDATIONS ---------- */}
-
-                {!loading && activeTab === "recommendations" && recommend && (
-
-                    <>
-                        <Title>Monthly Recommendations</Title>
-
-                        <SummaryGrid>
-
-                            <SummaryCard>
-                                <SummaryLabel>Month</SummaryLabel>
-                                <SummaryValue>{recommend.month}</SummaryValue>
-                            </SummaryCard>
-
-                            <SummaryCard>
-                                <SummaryLabel>Total Spending</SummaryLabel>
-                                <SummaryValue>₹{recommend.monthlySpending.toLocaleString()}</SummaryValue>
-                            </SummaryCard>
-
-                        </SummaryGrid>
-
-                        <Title>AI Recommendations</Title>
-
-                        <AIBox>
-
-                            <AIBadge>AI Generated Insight</AIBadge>
-
-                            <ReactMarkdown>
-                                {recommend.aiRecommendations}
-                            </ReactMarkdown>
-
-                        </AIBox>
-
-                    </>
-                )}
-
-                {/* ---------- FORECAST ---------- */}
-
-                {!loading && activeTab === "forecast" && forecast && (
-
-                    <>
-                        <Title>Spending Trend</Title>
-
-                        <ResponsiveContainer width="100%" height={250}>
-                            <LineChart data={forecast.historicalData}>
-                                <XAxis dataKey="month" stroke="var(--color-grey-500)" fontSize={12} />
-                                <YAxis stroke="var(--color-grey-500)" fontSize={12} />
-                                <Tooltip 
-                                    contentStyle={{ 
-                                        backgroundColor: 'var(--color-grey-0)', 
-                                        borderColor: 'var(--glass-border)',
-                                        color: 'var(--color-grey-900)'
-                                    }} 
-                                />
-                                <Line type="monotone" dataKey="total" stroke="var(--color-brand-500)" strokeWidth={3} dot={{ fill: 'var(--color-brand-500)' }} />
-                            </LineChart>
-                        </ResponsiveContainer>
-
-                        <Title>AI Forecast</Title>
-
-                        <AIBox>
-
-                            <AIBadge>AI Generated Insight</AIBadge>
-
-                            <ReactMarkdown>
-                                {forecast.aiForecast}
-                            </ReactMarkdown>
-
-                        </AIBox>
-
-                    </>
-                )}
-
-            </ContentBox>
-
-        </Container>
-    );
+        .summary-card strong {
+          font-size: 16px;
+        }
+      `}</style>
+    </div>
+  );
 };
 
 export default AIInsights;

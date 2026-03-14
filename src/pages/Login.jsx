@@ -1,83 +1,7 @@
-import React, { useState,useEffect } from "react";
-import styled from "styled-components";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css'; 
-
-const CenteredContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f4f4f4;
-`;
-
-const FormContainer = styled.div`
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  width: 350px;
-`;
-
-const Header = styled.h2`
-  background-color: #3498db;
-  color: #fff;
-  margin: 0;
-  padding: 20px;
-`;
-
-const LoginForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-`;
-
-const FormInput = styled.input`
-  margin-bottom: 15px;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-`;
-
-const SubmitButton = styled.button`
-  background-color: #3498db;
-  color: #fff;
-  padding: 10px;
-  font-size: 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #2980b9;
-  }
-`;
-
-const CreateAccountLink = styled.p`
-  text-align: center;
-  margin-top: 15px;
-  font-size: 14px;
-  margin-bottom: 20px;
-
-  a {
-    color: #3498db;
-    text-decoration: underline;
-
-    &:hover {
-      color: #2980b9;
-    }
-  }
-`;
-
-const SelectRole = styled.select`
-  margin-bottom: 15px;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-`;
+import expense from "../assets/images/expense1.jpg";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -87,75 +11,112 @@ const Login = () => {
 
   useEffect(() => {
     const auth = localStorage.getItem("user");
-    if (auth) {
-      navigate("/");
-    }
-  }, []);
+    if (auth) navigate("/");
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login clicked!");
+
     try {
-      let result = await fetch("http://localhost:3000/api/users/login", {
-        method: "post",
-        body: JSON.stringify({ email, password }),
-        headers: { 'Content-Type': 'application/json' }
-      });
+      let result = await fetch(
+        "https://expense-todo-five.vercel.app/api/users/login",
+        {
+          method: "POST",
+          body: JSON.stringify({ email, password }),
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+
       result = await result.json();
-      // console.warn(result);
+
       if (result.token) {
         localStorage.setItem("user", JSON.stringify(result.loginUser));
-        localStorage.setItem("token", JSON.stringify(result.token));
-        toast.success("Login Successfully", {
-          position: "top-right",
-        });
-        if (result.loginUser.role === "admin") {
-          console.log(result.loginUser.role);
-          navigate("/");
-        } else {
-          navigate("/");
-        }
+        localStorage.setItem("token", result.token);
+        toast.success("Login Successfully");
+        navigate("/");
       } else {
-        toast.warning(result.error || "Login failed", {
-          position: "top-right"
-        });
+        toast.warning(result.error || "Login failed");
       }
     } catch (error) {
-      console.error("Login error:", error);
-      toast.error("Network error. Please try again.", {
-        position: "top-right"
-      });
+      toast.error("Network error. Please try again.");
     }
   };
 
   return (
-    <CenteredContainer>
-      <FormContainer>
-        <Header>Login</Header>
-        <LoginForm onSubmit={handleSubmit}>
-          <FormInput
-            type="text"
-            placeholder="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <FormInput
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <SelectRole value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="user">User</option>
-            {/* <option value="admin">Club Admin</option> */}
-          </SelectRole>
-          <SubmitButton type="submit">Login</SubmitButton>
-        </LoginForm>
-        <CreateAccountLink>
-          Don't have an account? <Link to="/signup">Create Account</Link>
-        </CreateAccountLink>
-      </FormContainer>
-    </CenteredContainer>
+    <div className="relative min-h-screen bg-blue-500 flex items-center justify-center">
+      {/* BACKGROUND IMAGE (mobile) */}
+      <img
+        src={expense}
+        alt="background"
+        className="absolute inset-0 w-full h-full object-cover md:hidden"
+      />
+
+      {/* OVERLAY for better readability */}
+      <div className="absolute inset-0 bg-black/40 md:hidden"></div>
+
+      {/* DESKTOP LEFT IMAGE */}
+      <div className="hidden md:flex w-1/2 h-screen">
+        <img
+          src={expense}
+          alt="login illustration"
+          className="object-cover w-full h-full"
+        />
+      </div>
+
+      {/* LOGIN SECTION */}
+      <div className="relative flex flex-col justify-center  items-center w-full md:w-1/2 px-6">
+        <div className="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-8">
+          <h2 className="text-3xl font-bold text-gray-800 text-center mb-6">
+            Welcome Back
+          </h2>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg text-black px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none"
+              required
+            />
+
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg text-black px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none"
+              required
+            />
+
+            {/* <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none"
+            >
+              <option value="user">User</option>
+            </select> */}
+
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition duration-200"
+            >
+              Login
+            </button>
+          </form>
+
+          <p className="text-center text-gray-600 mt-6">
+            Don't have an account?{" "}
+            <Link
+              to="/signup"
+              className="text-indigo-600 hover:text-indigo-700 font-medium"
+            >
+              Create Account
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 

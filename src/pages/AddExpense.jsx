@@ -1,76 +1,165 @@
-import React from 'react';
-import ExpenseForm from '../ui/ExpenseForm';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import checkAuth from '../api/checkauth';
-import styled from 'styled-components';
-
-const PageWrapper = styled.div`
-  padding: 40px 20px;
-  max-width: 800px;
-  margin: 0 auto;
-`;
-
-const Header = styled.div`
-  text-align: center;
-  margin-bottom: 30px;
-  
-  h1 {
-    font-size: 3rem;
-    color: var(--color-grey-900);
-    margin-bottom: 8px;
-  }
-  
-  p {
-    color: var(--color-grey-400);
-    font-size: 1.6rem;
-  }
-`;
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import checkAuth from "../api/checkauth";
 
 const AddExpense = () => {
   const navigate = useNavigate();
 
-  const handleAddExpense = async (expenseData) => {
+  const [form, setForm] = useState({
+    expenseName: "",
+    amount: "",
+    expenseType: "",
+    issuedTo: "",
+    date: "",
+    notes: "",
+  });
+
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     try {
-      const token = JSON.parse(localStorage.getItem("token"));
+      const token = localStorage.getItem("token");
 
-      const response = await fetch("http://localhost:3000/api/expenses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: `bearer ${token}`,
+      const res = await fetch(
+        "https://expense-todo-five.vercel.app/api/expenses",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `bearer ${token}`,
+          },
+          body: JSON.stringify(form),
         },
-        body: JSON.stringify(expenseData),
-      });
+      );
 
-      const isAuthValid = await checkAuth(response);
-      if (!isAuthValid) {
-        navigate("/login");
-        return;
-      }
+      const isAuthValid = await checkAuth(res);
+      if (!isAuthValid) return navigate("/login");
 
-      if (!response.ok) {
-        throw new Error("Failed to add expense");
-      }
+      if (!res.ok) throw new Error("Failed to add expense");
 
-      toast.success("New Expense added!", {
-        position: "top-right",
-      });
-
-      navigate("/expenses"); 
-    } catch (error) {
-      toast.error(error.message);
+      toast.success("Expense added!");
+      navigate("/expenses");
+    } catch (err) {
+      toast.error(err.message);
     }
   };
 
   return (
-    <PageWrapper>
-      <Header>
-        <h1>Add New Expense</h1>
-        <p>Log your daily expenses to stay on track</p>
-      </Header>
-      <ExpenseForm onSubmit={handleAddExpense} submitButtonText="Add Expense" />
-    </PageWrapper>
+    <div className=" bg-[var(--bg-main)] flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-lg shadow-sm p-10">
+        {/* HEADER */}
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-base font-semibold text-[var(--text-primary)]">
+            Add Expense
+          </h1>
+
+          <span className="text-xs text-[var(--text-secondary)]">
+            Quick entry
+          </span>
+        </div>
+
+        {/* FORM */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <input
+            name="expenseName"
+            placeholder="Expense name"
+            value={form.expenseName}
+            onChange={handleChange}
+            className="input"
+            required
+          />
+
+          <input
+            name="amount"
+            type="number"
+            placeholder="Amount"
+            value={form.amount}
+            onChange={handleChange}
+            className="input"
+            required
+          />
+
+          <input
+            name="expenseType"
+            placeholder="Category"
+            value={form.expenseType}
+            onChange={handleChange}
+            className="input"
+          />
+
+          <input
+            name="issuedTo"
+            placeholder="Issued to"
+            value={form.issuedTo}
+            onChange={handleChange}
+            className="input"
+          />
+
+          <input
+            name="date"
+            type="date"
+            value={form.date}
+            onChange={handleChange}
+            className="input"
+          />
+
+          <textarea
+            name="notes"
+            placeholder="Notes"
+            value={form.notes}
+            onChange={handleChange}
+            rows={2}
+            className="input resize-none"
+          />
+
+          <button
+            type="submit"
+            className="
+            mt-2
+            bg-indigo-500
+            text-white
+            text-sm
+            py-2
+            rounded-md
+            hover:bg-indigo-600
+            transition
+          "
+          >
+            Add Expense
+          </button>
+        </form>
+      </div>
+
+      {/* INPUT STYLE */}
+      <style jsx>{`
+        .input {
+          width: 100%;
+          padding: 6px 10px;
+          font-size: 13px;
+          height: 34px;
+          border-radius: 6px;
+          border: 1px solid var(--border-color);
+          background: var(--bg-main);
+          color: var(--text-primary);
+          outline: none;
+          transition: border 0.15s ease;
+        }
+
+        textarea.input {
+          height: auto;
+          min-height: 60px;
+          padding-top: 8px;
+        }
+
+        .input:focus {
+          border-color: #6366f1;
+        }
+      `}</style>
+    </div>
   );
 };
 

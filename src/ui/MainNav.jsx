@@ -1,111 +1,72 @@
-import { NavLink, useNavigate } from "react-router-dom";
-import styled from "styled-components";
-import {
-  HiOutlineHome,
-} from "react-icons/hi2";
+import { NavLink } from "react-router-dom";
+import { HiOutlineHome } from "react-icons/hi2";
 import { FcTodoList } from "react-icons/fc";
 import { GiReceiveMoney } from "react-icons/gi";
 import { LiaBirthdayCakeSolid } from "react-icons/lia";
-import { MdStickyNote2 } from "react-icons/md";
 
+function MainNav({ mobile }) {
+  const baseClass =
+    "flex items-center justify-center gap-2 py-3 rounded-md text-secondary transition";
 
-// Styling the NavList
-const NavList = styled.ul`
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  list-style: none;
-  padding: 0;
-
-  /* Horizontal layout for smaller screens */
-  @media (max-width: 1024px) {
-    flex-direction: row;
-    gap: 1rem;
-    overflow-x: auto; /* Allows scrolling if there are too many items */
-    white-space: nowrap;
-  }
-`;
-
-const StyledNavLink = styled(NavLink)`
-  &:link,
-  &:visited {
-    display: flex;
-    align-items: center;
-    gap: 1.2rem;
-
-    color: var(--color-grey-600);
-    font-size: 1.6rem;
-    font-weight: 500;
-    padding: 1.2rem 2.4rem;
-    transition: all 0.3s;
-  }
-
-  &:hover,
-  &:active,
-  &.active:link,
-  &.active:visited {
-    color: var(--color-grey-800);
-    background-color: var(--color-grey-200);
-    border-radius: var(--border-radius-sm);
-  }
-
-  & svg {
-    width: 2.4rem;
-    height: 2.4rem;
-    color: var(--color-grey-400);
-    transition: all 0.3s;
-  }
-
-  &:hover svg,
-  &:active svg,
-  &.active:link svg,
-  &.active:visited svg {
-    color: var(--color-brand-600);
-  }
-`;
-
-const Text = styled.span`
-  /* Hide text on mobile and tablet screens */
-  @media (max-width: 1024px) {
-    display: none;
-  }
-`;
-
-function MainNav() {
-  const auth = localStorage.getItem("user");
-  const naviagte = useNavigate();
-  if (!auth) {
-    naviagte("/signup");
-  }
+  const activeClass = "bg-main text-primary";
 
   return (
-    <nav>
-      <NavList>
-        <li>
-          <StyledNavLink to="/dashboard">
-            <HiOutlineHome />
-            <Text>Home</Text>
-          </StyledNavLink>
+    <nav className="w-full">
+      <ul
+        className={
+          mobile
+            ? "flex w-full items-center justify-between"
+            : "flex flex-col gap-1"
+        }
+      >
+        <li className={mobile ? "flex-1 text-center" : ""}>
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              `${baseClass} ${mobile ? "flex-col" : ""} ${isActive ? activeClass : ""}`
+            }
+          >
+            <HiOutlineHome size={22} />
+            {!mobile && <span>Home</span>}
+          </NavLink>
         </li>
-        <li>
-          <StyledNavLink to="/todo/default">
-            <FcTodoList />
-            <Text>Todo</Text>
-          </StyledNavLink>
+
+        <li className={mobile ? "flex-1 text-center" : ""}>
+          <NavLink
+            to="/todo/default"
+            className={({ isActive }) =>
+              `${baseClass} ${mobile ? "flex-col" : ""} ${isActive ? activeClass : ""}`
+            }
+          >
+            <FcTodoList size={22} />
+            {!mobile && <span>Todo</span>}
+          </NavLink>
         </li>
-        <li>
-          <StyledNavLink to="/expenses">
-            <GiReceiveMoney />
-            <Text>Expenses</Text>
-          </StyledNavLink>
+
+        <li className={mobile ? "flex-1 text-center" : ""}>
+          <NavLink
+            to="/expenses"
+            className={({ isActive }) =>
+              `${baseClass} ${mobile ? "flex-col" : ""} ${isActive ? activeClass : ""}`
+            }
+          >
+            <GiReceiveMoney size={22} />
+            {!mobile && <span>Expenses</span>}
+          </NavLink>
         </li>
-        <li>
-          <StyledNavLink to="/birthday">
-            <LiaBirthdayCakeSolid />
-            <Text>Birthday</Text>
-          </StyledNavLink>
+
+        <li className={mobile ? "flex-1 text-center" : ""}>
+          <NavLink
+            to="/birthday"
+            className={({ isActive }) =>
+              `${baseClass} ${mobile ? "flex-col" : ""} ${isActive ? activeClass : ""}`
+            }
+          >
+            <LiaBirthdayCakeSolid size={22} />
+            {!mobile && <span>Birthday</span>}
+          </NavLink>
         </li>
-      </NavList>
+      </ul>
     </nav>
   );
 }
