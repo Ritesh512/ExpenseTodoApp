@@ -1,128 +1,124 @@
-import styled from "styled-components";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import Logo from "./Logo"; 
-import { HiOutlineMoon, HiOutlineSun } from "react-icons/hi2";
-
-const StyledHeader = styled.header`
-  background-color: var(--color-grey-0);
-  padding: 1.2rem 4.8rem;
-  border-bottom: 1px solid var(--color-grey-100);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  backdrop-filter: blur(8px);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  
-  @media (max-width: 768px) {
-    padding: 1rem 2.4rem;
-  }
-`;
-
-const LogoWrapper = styled.div`
-  @media (max-width: 768px) {
-    margin-right: 1.5rem;
-    display: block;
-  }
-
-  @media (min-width: 769px) {
-    display: none;
-  }
-`;
-
-const HeaderContent = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  gap: 2rem;
-`;
-
-const RightSection = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-`;
-
-const ThemeToggle = styled.button`
-  background: var(--color-bg-accent);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--border-radius-sm);
-  padding: 0.6rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  color: var(--color-brand-500);
-
-  &:hover {
-    background: var(--color-brand-100);
-    transform: translateY(-1px);
-  }
-
-  svg {
-    width: 2.2rem;
-    height: 2.2rem;
-  }
-`;
-
-const LogoutLink = styled(Link)`
-  text-decoration: none;
-  color: var(--color-grey-600);
-  font-weight: 600;
-  font-size: 1.4rem;
-  padding: 0.6rem 1.2rem;
-  border-radius: var(--border-radius-sm);
-  transition: all 0.2s;
-
-  &:hover {
-    background: var(--color-grey-100);
-    color: var(--color-grey-900);
-  }
-`;
-
-const TabTitle = styled.div`
-  color: var(--color-grey-900);
-  font-weight: 700;
-  font-size: 1.8rem;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-`;
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
+import Logo from "./Logo";
+import {
+  HiOutlineMoon,
+  HiOutlineSun,
+  HiOutlineUserCircle,
+  HiOutlineArrowRightOnRectangle,
+  HiOutlineCog6Tooth,
+} from "react-icons/hi2";
 
 function Header({ theme, toggleTheme }) {
-  const auth = localStorage.getItem("user");
   const navigate = useNavigate();
   const location = useLocation();
-  const currentTabName = location.pathname.split("/")[1] || "Dashboard";
+  const [open, setOpen] = useState(false);
+
+  const auth = localStorage.getItem("user");
+  const user = auth ? JSON.parse(auth) : {};
+
+  const username = user.username?.split(" ")[0] || "User";
+
+  const currentTabName = location.pathname.split("/")[1] || "dashboard";
 
   function logout() {
     localStorage.clear();
     navigate("/login");
   }
 
-  const username = auth ? JSON.parse(auth).username.split(' ')[0] : "User";
+  function goToSettings() {
+    navigate("/settings");
+    setOpen(false);
+  }
 
   return (
-    <StyledHeader>
-      <LogoWrapper>
+    <header
+      className="w-full px-4 md:px-6 py-3 flex items-center justify-between sticky top-0 z-40"
+      style={{
+        background: "var(--bg-surface)",
+        borderBottom: "1px solid var(--border-color)",
+        color: "var(--text-primary)",
+      }}
+    >
+      {/* MOBILE LOGO */}
+      <div className="lg:hidden">
         <Logo />
-      </LogoWrapper>
+      </div>
 
-      <HeaderContent>
-        <TabTitle>{currentTabName}</TabTitle>
+      {/* DESKTOP PAGE TITLE */}
+      <h1 className="hidden lg:block text-lg font-semibold uppercase">
+        {currentTabName}
+      </h1>
 
-        <RightSection>
-          <ThemeToggle onClick={toggleTheme} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
-            {theme === "dark" ? <HiOutlineSun /> : <HiOutlineMoon />}
-          </ThemeToggle>
+      <div className="flex items-center gap-3">
+        {/* THEME BUTTON */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-md hover:opacity-80 transition"
+        >
+          {theme === "dark" ? (
+            <HiOutlineSun size={22} />
+          ) : (
+            <HiOutlineMoon size={22} />
+          )}
+        </button>
 
-          <LogoutLink onClick={logout} to="/login">
-            Logout ({username})
-          </LogoutLink>
-        </RightSection>
-      </HeaderContent>
-    </StyledHeader>
+        {/* USER MENU */}
+        <div className="relative flex items-center gap-2">
+          {/* MOBILE SETTINGS ICON */}
+          <button onClick={goToSettings} className="lg:hidden">
+            <HiOutlineCog6Tooth size={22} />
+          </button>
+
+          {/* MOBILE LOGOUT */}
+          <button onClick={logout} className="lg:hidden">
+            <HiOutlineArrowRightOnRectangle size={24} />
+          </button>
+
+          {/* DESKTOP USER ICON */}
+          <button onClick={() => setOpen(!open)} className="hidden lg:block">
+            <HiOutlineUserCircle size={30} />
+          </button>
+
+          {/* DESKTOP DROPDOWN */}
+          {open && (
+            <div
+              className="absolute right-0 mt-40 w-44 rounded-lg shadow-lg"
+              style={{
+                background: "var(--bg-surface)",
+                border: "1px solid var(--border-color)",
+              }}
+            >
+              <div
+                className="px-4 py-2 text-sm border-b"
+                style={{
+                  color: "var(--text-secondary)",
+                  borderColor: "var(--border-color)",
+                }}
+              >
+                {username}
+              </div>
+
+              <button
+                onClick={goToSettings}
+                className="w-full text-left px-4 py-2 text-sm hover:opacity-80 flex items-center gap-2"
+              >
+                <HiOutlineCog6Tooth size={16} />
+                Settings
+              </button>
+
+              <button
+                onClick={logout}
+                className="w-full text-left px-4 py-2 text-sm hover:opacity-80 flex items-center gap-2"
+              >
+                <HiOutlineArrowRightOnRectangle size={16} />
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
   );
 }
 

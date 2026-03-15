@@ -1,19 +1,17 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
 
-const Card = styled.div`
-  background: linear-gradient(to right, #6a11cb, #2575fc);
-  color: #fff;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-`;
+const SummaryCard = ({ totalSpending }) => {
+  return (
+    <div className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white p-4 rounded-lg shadow-md mb-2">
+      <h3 className="text-sm font-semibold mb-1">Summary</h3>
 
-const SummaryCard = ({ totalSpending }) => (
-  <Card>
-    <h3>Summary</h3>
-    <p>Total Spending: ₹{totalSpending}</p>
-  </Card>
-);
+      <p className="text-lg font-bold">
+        ₹{totalSpending.toLocaleString("en-IN")}
+      </p>
+
+      <p className="text-xs opacity-80">Total Spending</p>
+    </div>
+  );
+};
 
 export default SummaryCard;

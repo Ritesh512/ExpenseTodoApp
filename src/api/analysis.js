@@ -4,14 +4,14 @@ export const getCategoryBreakdown = async (filters) => {
   const { startDate, endDate } = filters;
 
   const response = await fetch(
-    `http://localhost:3000/api/expenses/analysis/category-breakdown?startDate=${startDate}&endDate=${endDate}`,
+    `https://expense-todo-five.vercel.app/api/expenses/analysis/category-breakdown?startDate=${startDate}&endDate=${endDate}`,
     {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
+        authorization: `bearer ${localStorage.getItem("token")}`,
       },
-    }
+    },
   );
 
   const isAuthValid = await checkAuth(response);
@@ -20,7 +20,9 @@ export const getCategoryBreakdown = async (filters) => {
   }
 
   if (!response.ok) {
-    throw new Error(`Error fetching category breakdown: ${response.statusText}`);
+    throw new Error(
+      `Error fetching category breakdown: ${response.statusText}`,
+    );
   }
 
   return response.json();
@@ -30,14 +32,14 @@ export const getSpendingTrends = async (filters) => {
   const { startDate, endDate, interval = "monthly" } = filters;
 
   const response = await fetch(
-    `http://localhost:3000/api/expenses/analysis/spending-trends?startDate=${startDate}&endDate=${endDate}&interval=${interval}`,
+    `https://expense-todo-five.vercel.app/api/expenses/analysis/spending-trends?startDate=${startDate}&endDate=${endDate}&interval=${interval}`,
     {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
+        authorization: `bearer ${localStorage.getItem("token")}`,
       },
-    }
+    },
   );
 
   const isAuthValid = await checkAuth(response);
@@ -56,14 +58,14 @@ export const getTopExpenses = async (filters) => {
   const { startDate, endDate, limit = 5 } = filters;
 
   const response = await fetch(
-    `http://localhost:3000/api/expenses/analysis/top-expenses?startDate=${startDate}&endDate=${endDate}&limit=${limit}`,
+    `https://expense-todo-five.vercel.app/api/expenses/analysis/top-expenses?startDate=${startDate}&endDate=${endDate}&limit=${limit}`,
     {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
+        authorization: `bearer ${localStorage.getItem("token")}`,
       },
-    }
+    },
   );
 
   const isAuthValid = await checkAuth(response);
@@ -78,19 +80,18 @@ export const getTopExpenses = async (filters) => {
   return response.json();
 };
 
-
 export const getLowExpenses = async (filters) => {
   const { startDate, endDate, limit = 5 } = filters;
 
   const response = await fetch(
-    `http://localhost:3000/api/expenses/analysis/low-expenses?startDate=${startDate}&endDate=${endDate}&limit=${limit}`,
+    `https://expense-todo-five.vercel.app/api/expenses/analysis/low-expenses?startDate=${startDate}&endDate=${endDate}&limit=${limit}`,
     {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
+        authorization: `bearer ${localStorage.getItem("token")}`,
       },
-    }
+    },
   );
 
   const isAuthValid = await checkAuth(response);
@@ -108,14 +109,14 @@ export const getLowExpenses = async (filters) => {
 // AI Analysis API
 export const getAIAnalysis = async (startDate, endDate) => {
   const response = await fetch(
-    `http://localhost:3000/api/ai/analysis?startDate=${startDate}&endDate=${endDate}`,
+    `https://expense-todo-five.vercel.app/api/ai/analysis?startDate=${startDate}&endDate=${endDate}`,
     {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
+        authorization: `bearer ${localStorage.getItem("token")}`,
       },
-    }
+    },
   );
 
   const isAuthValid = await checkAuth(response);
@@ -124,7 +125,9 @@ export const getAIAnalysis = async (startDate, endDate) => {
   }
 
   if (response.status === 429) {
-    throw new Error("Too many requests. Please wait a moment before trying again. (Rate limited)");
+    throw new Error(
+      "Too many requests. Please wait a moment before trying again. (Rate limited)",
+    );
   }
 
   if (!response.ok) {
@@ -137,14 +140,14 @@ export const getAIAnalysis = async (startDate, endDate) => {
 // AI Recommendations API
 export const getAIRecommendations = async (month, year) => {
   const response = await fetch(
-    `http://localhost:3000/api/ai/recommendations?month=${month}&year=${year}`,
+    `https://expense-todo-five.vercel.app/api/ai/recommendations?month=${month}&year=${year}`,
     {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
+        authorization: `bearer ${localStorage.getItem("token")}`,
       },
-    }
+    },
   );
 
   const isAuthValid = await checkAuth(response);
@@ -153,11 +156,15 @@ export const getAIRecommendations = async (month, year) => {
   }
 
   if (response.status === 429) {
-    throw new Error("Too many requests. Please wait a moment before trying again. (Rate limited)");
+    throw new Error(
+      "Too many requests. Please wait a moment before trying again. (Rate limited)",
+    );
   }
 
   if (!response.ok) {
-    throw new Error(`Error fetching AI recommendations: ${response.statusText}`);
+    throw new Error(
+      `Error fetching AI recommendations: ${response.statusText}`,
+    );
   }
 
   return response.json();
@@ -166,14 +173,14 @@ export const getAIRecommendations = async (month, year) => {
 // AI Forecast API
 export const getAIForecast = async (months) => {
   const response = await fetch(
-    `http://localhost:3000/api/ai/forecast?months=${months}`,
+    `https://expense-todo-five.vercel.app/api/ai/forecast?months=${months}`,
     {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
+        authorization: `bearer ${localStorage.getItem("token")}`,
       },
-    }
+    },
   );
 
   const isAuthValid = await checkAuth(response);
@@ -182,7 +189,9 @@ export const getAIForecast = async (months) => {
   }
 
   if (response.status === 429) {
-    throw new Error("Too many requests. Please wait a moment before trying again. (Rate limited)");
+    throw new Error(
+      "Too many requests. Please wait a moment before trying again. (Rate limited)",
+    );
   }
 
   if (!response.ok) {

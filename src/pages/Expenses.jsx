@@ -1,17 +1,16 @@
-import { Outlet } from 'react-router-dom';
-import ExpenseNavbar from '../ui/ExpenseNavbar';
-
+import { Outlet } from "react-router-dom";
+import ExpenseNavbar from "../ui/ExpenseNavbar";
 
 const Expenses = () => {
   return (
     <div>
       <ExpenseNavbar />
-      
-      <div style={{ marginTop: '20px' }}>
+
+      <div style={{ marginTop: "0px" }}>
         <Outlet />
       </div>
     </div>
-  )
+  );
 };
 
-export default Expenses
+export default Expenses;

@@ -1,147 +1,154 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { FaTrashAlt, FaArrowLeft } from 'react-icons/fa';
-import { useLocation } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { FaTrashAlt, FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useNavigate } from 'react-router-dom';
-import checkAuth from '../api/checkauth';
-
-// Styled components
-const Container = styled.div`
-  max-width: 500px;
-  margin: 20px auto;
-  padding: 30px 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  background-color: #fff;
-  border-radius: 8px;
-  min-height: 100px; /* Minimum height to fit small content */
-  max-height: 500px; /* Fixed maximum height */
-  overflow-y: auto; /* Scrollable if content overflows */
-`;
-
-// const Heading = styled.h2`
-//   top: 20px; 
-//   background-color: #fff; /* Match container background */
-//   margin: 0 0 20px; /* Remove top margin and add bottom margin */
-//   padding: 10px 0; /* Add padding for better spacing */
-//   text-align: center;
-//   color: #333;
-// `;
-
-const Heading = styled.h1`
-  display: flex;
-  align-items: center;
-  font-size: 24px;
-  padding: 10px;
-  justify-content: flex-start;
-  gap:20px;
-  background-color: #fff;
-  color: #333;
-`;
-
-const BackIcon = styled(FaArrowLeft)`
-  margin-right: 10px;
-  cursor: pointer;
-`;
-
-const ListContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  border-radius: 8px; /* Round the corners */
-  margin-bottom: 10px; /* Gap between each list item */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow between items */
-  background-color: #f9f9f9; /* Light background for list items */
-`;
-
-const ListItem = styled.span`
-  font-size: 16px;
-  color: #333;
-`;
-
-const DeleteButton = styled.button`
-  background: none;
-  border: none;
-  color: #ff6b6b;
-  cursor: pointer;
-  font-size: 18px;
-  transition: color 0.3s ease;
-
-  &:hover {
-    color: #d9534f;
-  }
-`;
+import checkAuth from "../api/checkauth";
 
 const EditListName = () => {
-  const { state } = useLocation();
-  const [listNames, setListNames] = useState(state?.userList || []);
-
+  const [listNames, setListNames] = useState([]);
   const navigate = useNavigate();
 
-  const handleBackClick = () => {
-    navigate(-1); 
-  };
+  /* ================= FETCH LISTS ================= */
+
+  useEffect(() => {
+    const fetchLists = async () => {
+      try {
+        const response = await fetch(
+          "https://expense-todo-five.vercel.app/api/users/todo/lists",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              authorization: `bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
+
+        const isAuthValid = await checkAuth(response);
+        if (!isAuthValid) {
+          navigate("/login");
+          return;
+        }
+
+        const data = await response.json();
+
+        if (!data?.lists) return;
+
+        const formatted = data.lists.map((list) => ({
+          label: list.listName,
+          value: list._id,
+        }));
+
+        setListNames(formatted);
+      } catch (err) {
+        toast.error("Failed to load lists");
+      }
+    };
+
+    fetchLists();
+  }, []);
+
+  /* ================= DELETE LIST ================= */
 
   const handleDelete = async (listId) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/users/todo/lists/${listId}`, {
-        method: 'DELETE',
-        headers: {
-          "Content-Type": "application/json",
-          authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
-        }
-      });
+      const response = await fetch(
+        `https://expense-todo-five.vercel.app/api/users/todo/lists/${listId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
 
       const isAuthValid = await checkAuth(response);
-        if (!isAuthValid) {
-            navigate("/login");
-            return;
-        }
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+      if (!isAuthValid) {
+        navigate("/login");
+        return;
       }
 
-      setListNames((prevListNames) => prevListNames.filter((list) => list.value !== listId));
+      if (!response.ok) {
+        throw new Error("Failed to delete list");
+      }
 
-      const data = await response.json();
-      console.log('Delete successfully!', data);
-      toast.success("List Deleted successful:", {
-        position: "top-right",
-      });
+      setListNames((prev) => prev.filter((list) => list.value !== listId));
 
-      // Optionally, you can remove the deleted item from the UI
-      // after a successful delete. You'll need to manage state.
-    } catch (error) {
-      toast.warning("Error deleting item!", {
-        position: "top-right",
-      });
-      console.error('Error deleting item:', error);
+      toast.success("List deleted successfully");
+    } catch (err) {
+      toast.error("Error deleting list");
     }
   };
 
   return (
-    <>
-      <Heading>
-        <BackIcon onClick={handleBackClick} />
-        Edit List Names
-      </Heading>
-      <Container>
-        {listNames.length > 0 ?
-          listNames.map((list, index) => (
-            <ListContainer key={index}>
-              <ListItem>{list.label}</ListItem>
-              <DeleteButton onClick={() => handleDelete(list.value)}>
+    <div
+      className="min-h-screen px-4 py-6 md:px-6 space-y-6"
+      style={{ background: "var(--bg-main)" }}
+    >
+      {/* HEADER */}
+
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-2 rounded-md border"
+          style={{
+            borderColor: "var(--border-color)",
+            color: "var(--text-primary)",
+          }}
+        >
+          <FaArrowLeft />
+        </button>
+
+        <h1
+          className="text-xl md:text-2xl font-semibold"
+          style={{ color: "var(--text-primary)" }}
+        >
+          Edit List Names
+        </h1>
+      </div>
+
+      {/* LIST CONTAINER */}
+
+      <div
+        className="max-w-lg mx-auto rounded-xl border p-4 md:p-6 space-y-3"
+        style={{
+          background: "var(--bg-surface)",
+          borderColor: "var(--border-color)",
+        }}
+      >
+        {listNames.length > 0 ? (
+          listNames.map((list) => (
+            <div
+              key={list.value}
+              className="flex items-center justify-between px-4 py-3 rounded-lg border"
+              style={{ borderColor: "var(--border-color)" }}
+            >
+              <span
+                className="text-sm md:text-base font-medium"
+                style={{ color: "var(--text-primary)" }}
+              >
+                {list.label}
+              </span>
+
+              <button
+                onClick={() => handleDelete(list.value)}
+                className="p-2 rounded-md transition hover:opacity-80"
+                style={{ color: "#ef4444" }}
+              >
                 <FaTrashAlt />
-              </DeleteButton>
-            </ListContainer>
+              </button>
+            </div>
           ))
-          :
-          <h1>No List Added Yet!</h1>
-        }
-      </Container>
-    </>
+        ) : (
+          <p
+            className="text-center py-8"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            No Lists Added Yet
+          </p>
+        )}
+      </div>
+    </div>
   );
 };
 

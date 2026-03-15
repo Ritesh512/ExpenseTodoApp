@@ -8,31 +8,33 @@ const UserProfile = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-        try {
-            const response = await fetch("http://localhost:3000/api/user/profile", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    authorization: `bearer ${JSON.parse(localStorage.getItem("token"))}`,
-                },
-            });
+      try {
+        const response = await fetch(
+          "https://expense-todo-five.vercel.app/api/user/profile",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              authorization: `bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
 
-            const isAuthValid = await checkAuth(response);
-            if (!isAuthValid) {
-                navigate("/login"); // Redirect to login if authentication fails
-                return;
-            }
-
-            const data = await response.json();
-            setProfile(data);
-        } catch (error) {
-            console.error("Error fetching profile:", error);
+        const isAuthValid = await checkAuth(response);
+        if (!isAuthValid) {
+          navigate("/login"); // Redirect to login if authentication fails
+          return;
         }
+
+        const data = await response.json();
+        setProfile(data);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
     };
 
     fetchProfile();
-}, []);
-
+  }, []);
 
   if (!profile) return <div>Loading...</div>;
 
@@ -48,7 +50,10 @@ const UserProfile = () => {
       <p>Pending To-Dos: {profile.todoPending}</p>
       <p>Completed To-Dos: {profile.todoDone}</p>
       <p>Current Month Expense: ${profile.currentMonthExpense}</p>
-      <p>Top Expense: {profile.topExpense.category} - ${profile.topExpense.amount}</p>
+      <p>
+        Top Expense: {profile.topExpense.category} - $
+        {profile.topExpense.amount}
+      </p>
       <p>Last Month Expense: ${profile.lastMonthExpense}</p>
     </div>
   );

@@ -1,88 +1,95 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import styled from 'styled-components';
-import { FaPlus, FaEye, FaExchangeAlt, FaChartBar, FaRobot } from 'react-icons/fa';
+import React from "react";
+import { NavLink } from "react-router-dom";
+import {
+  FaPlus,
+  FaEye,
+  FaExchangeAlt,
+  FaChartBar,
+  FaRobot,
+} from "react-icons/fa";
 
-const NavbarContainer = styled.nav`
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  padding: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-md);
-  margin: 10px 20px;
-  gap: 8px;
-  position: sticky;
-  top: 20px;
-  z-index: 50;
-  
-  @media (max-width: 768px) {
-    margin: 5px 10px;
-    padding: 8px;
-    overflow-x: auto;
-    justify-content: flex-start;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
-`;
-
-const StyledNavLink = styled(NavLink)`
-  color: var(--color-grey-500);
-  text-decoration: none;
-  font-size: 1.5rem;
-  font-weight: 500;
-  padding: 10px 20px;
-  border-radius: var(--border-radius-md);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  white-space: nowrap;
-
-  & svg {
-    font-size: 1.8rem;
-    transition: transform 0.3s ease;
-  }
-
-  &.active {
-    color: var(--color-brand-500);
-    background: var(--color-bg-accent);
-    box-shadow: inset 0 0 10px rgba(99, 102, 241, 0.1);
-    
-    & svg {
-      transform: scale(1.2);
-    }
-  }
-
-  &:hover:not(.active) {
-    color: var(--color-grey-800);
-    background: rgba(255, 255, 255, 0.05);
-    transform: translateY(-2px);
-  }
-
-  @media (max-width: 768px) {
-    font-size: 1.4rem;
-    padding: 8px 16px;
-    gap: 8px;
-  }
-`;
+const navItems = [
+  { to: "add-expense", icon: FaPlus, label: "Add" },
+  { to: "view-expense", icon: FaEye, label: "View" },
+  { to: "compare", icon: FaExchangeAlt, label: "Compare" },
+  { to: "analysis", icon: FaChartBar, label: "Analysis" },
+  { to: "ai-insights", icon: FaRobot, label: "AI" },
+];
 
 const ExpenseNavbar = () => {
   return (
-    <NavbarContainer>
-      <StyledNavLink to="add-expense"><FaPlus /> <span>Add Expense</span></StyledNavLink>
-      <StyledNavLink to="view-expense"><FaEye /> <span>View Expense</span></StyledNavLink>
-      <StyledNavLink to="compare"><FaExchangeAlt /> <span>Compare</span></StyledNavLink>
-      <StyledNavLink to="analysis"><FaChartBar /> <span>Analysis</span></StyledNavLink>
-      <StyledNavLink to="ai-insights"><FaRobot /> <span>AI Insights</span></StyledNavLink>
-    </NavbarContainer>
+    <>
+      {/* Desktop Navbar */}
+      <div className="hidden md:flex justify-center px-2">
+        <nav
+          className="flex gap-2 
+          bg-[var(--bg-surface)] 
+          backdrop-blur-md 
+          border border-[var(--border-color)]/40
+          rounded-2xl 
+          shadow-[0_12px_30px_rgba(0,0,0,0.25)]
+          px-2 py-2"
+        >
+          {navItems.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `
+                  flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition
+                  ${
+                    isActive
+                      ? "bg-indigo-500 text-white shadow-[0_6px_18px_rgba(99,102,241,0.5)]"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--color-bg-accent)]"
+                  }
+                `
+                }
+              >
+                <Icon />
+                {item.label}
+              </NavLink>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* Mobile Bottom Navigation */}
+      <div
+        className="md:hidden fixed bottom-11 left-0 right-0 z-50 
+        bg-[var(--bg-surface)] 
+        border-t border-[var(--border-color)]/40
+        shadow-[0_-10px_25px_rgba(0,0,0,0.25)]"
+      >
+        <div className="flex justify-around items-center py-2">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `
+                  flex flex-col items-center text-xs transition
+                  ${
+                    isActive
+                      ? "text-indigo-500"
+                      : "text-[var(--text-secondary)]"
+                  }
+                `
+                }
+              >
+                <Icon className="text-lg mb-1" />
+                {item.label}
+              </NavLink>
+            );
+          })}
+        </div>
+      </div>
+    </>
   );
 };
 
