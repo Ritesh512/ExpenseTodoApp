@@ -4,15 +4,67 @@
     <meta charset="UTF-8" />
     <link
       rel="icon"
-      href="src/assets/images/Dollar Symbol.gif"
+      href="/src/assets/images/Dollar Symbol.gif"
       type="image/gif"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TrackYourExpense</title>
+    <style>
+      #loader {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
+        /* Override the global * transition with a faster one */
+        transition: opacity 0.4s ease !important;
+      }
+
+      #loader.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #loader span {
+        color: #6366f1;
+        font-family: sans-serif;
+        font-size: x-large;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+      }
+    </style>
   </head>
 
   <body>
+    <div id="loader">
+      <img
+        src="/src/assets/images/Dollar Symbol.gif"
+        alt="Loading..."
+        width="200"
+        height="200"
+      />
+
+      <span style="font-size: x-large; margin-top: 10px; display: block">
+        TrackYourExpense
+      </span>
+    </div>
+
     <div id="root"></div>
+
     <script type="module" src="/src/main.jsx"></script>
+
+    <script>
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          const loader = document.getElementById("loader");
+          loader.classList.add("hidden");
+          setTimeout(() => loader.remove(), 400); // matches transition duration
+        }, 2000); // 3 seconds display time
+      });
+    </script>
   </body>
 </html>

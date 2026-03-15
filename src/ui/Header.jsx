@@ -33,7 +33,7 @@ function Header({ theme, toggleTheme }) {
 
   return (
     <header
-      className="w-full px-4 md:px-6 py-3 flex items-center justify-between sticky top-0 z-40"
+      className="w-full px-4 md:px-6 py-1 flex items-center justify-between sticky top-0 z-40"
       style={{
         background: "var(--bg-surface)",
         borderBottom: "1px solid var(--border-color)",

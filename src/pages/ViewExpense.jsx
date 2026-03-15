@@ -128,7 +128,7 @@ const ViewExpense = () => {
     .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
-    <div className="bg-[var(--bg-main)] p-0 md:p-4">
+    <div className="  bg-[var(--bg-main)] p-0 md:p-4 mb-4">
       <div className="max-w-5xl mx-auto">
         {/* HEADER */}
         <div className="mb-2">
@@ -299,7 +299,7 @@ const ViewExpense = () => {
 
         {/* PAGINATION */}
         {totalPages > 1 && (
-          <div className="flex justify-center gap-1 mt-4 text-sm">
+          <div className="flex justify-center gap-1 mt-2 text-sm">
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => p - 1)}
