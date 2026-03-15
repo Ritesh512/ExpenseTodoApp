@@ -113,10 +113,12 @@ const ProfileChart = ({ title, data = [], type }) => {
 
   return (
     <div
-      className="w-full max-w-[450px] rounded-xl border shadow-sm p-6 transition hover:shadow-md"
+      className="w-full max-w-[450px] rounded-xl p-6 transition
+  shadow-[0_18px_40px_rgba(0,0,0,0.30)]
+  hover:shadow-[0_26px_60px_rgba(0,0,0,0.40)]"
       style={{
         background: "var(--bg-surface)",
-        borderColor: "var(--border-color)",
+        border: "1px solid var(--border-color)",
       }}
     >
       <h4

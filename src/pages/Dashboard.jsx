@@ -166,7 +166,7 @@ const Dashboard = () => {
       {/* CHARTS */}
 
       <div
-        className="rounded-lg shadow-sm p-4"
+        className="rounded-lg shadow-md p-4"
         style={{
           background: "var(--bg-surface)",
           border: "1px solid var(--border-color)",
