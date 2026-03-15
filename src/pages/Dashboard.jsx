@@ -112,8 +112,8 @@ const Dashboard = () => {
           <Stat
             title="Top Expense"
             value={
-              profile?.top_expense?.expenseType !== "NONE"
-                ? profile?.top_expense?.expenseType
+              profile?.top_expense?.amount !== "NONE"
+                ? profile?.top_expense?.amount
                 : "N/A"
             }
           />

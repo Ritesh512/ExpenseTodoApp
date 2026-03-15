@@ -49,7 +49,7 @@ const AddExpense = () => {
   };
 
   return (
-    <div className=" bg-[var(--bg-main)] flex items-center justify-center px-4">
+    <div className=" bg-[var(--bg-main)] flex items-center justify-center p-4 ">
       <div className="w-full max-w-md bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-lg shadow-sm p-10">
         {/* HEADER */}
         <div className="flex justify-between items-center mb-4">
