@@ -20,7 +20,6 @@ import EditExpense from "./pages/EditExpense";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 function App() {
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("theme") || "dark";
