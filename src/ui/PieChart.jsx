@@ -26,7 +26,7 @@ const PieChart = ({ data = [] }) => {
 
   return (
     <div
-      className="rounded-xl border shadow-sm p-6"
+      className="rounded-xl border shadow-md p-6"
       style={{
         background: "var(--bg-surface)",
         borderColor: "var(--border-color)",
