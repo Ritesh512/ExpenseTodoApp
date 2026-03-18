@@ -7,6 +7,8 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -20,25 +22,28 @@ const Signup = () => {
         password,
       };
 
-      let result = await fetch(
+      setLoading(true);
+      const response = await fetch(
         "https://expense-todo-five.vercel.app/api/users/signup",
         {
           method: "POST",
           body: JSON.stringify(userData),
           headers: { "Content-Type": "application/json" },
-        },
+        }
       );
 
-      result = await result.json();
+      const result = await response.json();
 
-      if (result.status === 200) {
-        toast.success("Signup Successfully");
+      if (response.ok) {
+        toast.success(result.message || "Signup Successfully");
         navigate("/login");
       } else {
         toast.warning(result.error || "Signup failed");
       }
     } catch (error) {
       toast.error("Network error. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,20 +94,30 @@ const Signup = () => {
               required
             />
 
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 text-black rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none"
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full border border-gray-300 text-black rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-indigo-500 outline-none"
+                required
+              />
+
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-600"
+              >
+                {showPassword ? "🙈" : "👁️"}
+              </span>
+            </div>
 
             <button
               type="submit"
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition duration-200"
+              disabled={loading}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition duration-200 disabled:opacity-50"
             >
-              Sign Up
+              {loading ? "Signing up..." : "Sign Up"}
             </button>
           </form>
 

@@ -7,6 +7,8 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,6 +18,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       let result = await fetch(
@@ -39,6 +42,8 @@ const Login = () => {
       }
     } catch (error) {
       toast.error("Network error. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,14 +85,23 @@ const Login = () => {
               required
             />
 
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg text-black px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none"
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full border border-gray-300 text-black rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-indigo-500 outline-none"
+                required
+              />
+
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-600"
+              >
+                {showPassword ? "🙈" : "👁️"}
+              </span>
+            </div>
 
             {/* <select
               value={role}
@@ -99,9 +113,10 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition duration-200"
+              disabled={loading}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition duration-200 disabled:opacity-50"
             >
-              Login
+              {loading ? "Taking you in..." : "Login"}
             </button>
           </form>
 
