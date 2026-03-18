@@ -38,7 +38,7 @@ const Signup = () => {
         toast.success(result.message || "Signup Successfully");
         navigate("/login");
       } else {
-        toast.warning(result.error || "Signup failed");
+        toast.warning(result.message || "Signup failed");
       }
     } catch (error) {
       toast.error("Network error. Please try again.");
