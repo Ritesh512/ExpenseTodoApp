@@ -216,11 +216,11 @@ const Compare = () => {
       categoryDifferences.length > 0
         ? categoryDifferences[0]
         : {
-            expenseType: "None",
-            difference: 0,
-            amount1: 0,
-            amount2: 0,
-          };
+          expenseType: "None",
+          difference: 0,
+          amount1: 0,
+          amount2: 0,
+        };
 
     // Calculate additional metrics
     const categoryCount1 = chartData1.length;

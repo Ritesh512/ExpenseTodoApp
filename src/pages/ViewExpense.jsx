@@ -8,6 +8,7 @@ import {
   FaFilePdf,
   FaFileExcel,
 } from "react-icons/fa";
+import { HiChevronDoubleDown, HiChevronDoubleUp } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import checkAuth from "../api/checkauth";
@@ -26,6 +27,7 @@ const ViewExpense = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   const navigate = useNavigate();
 
@@ -120,12 +122,21 @@ const ViewExpense = () => {
     0,
   );
 
-  const totalPages = Math.ceil(filteredExpenses.length / ITEMS_PER_PAGE);
-
-  const paginatedExpenses = filteredExpenses
+  const sortedExpenses = filteredExpenses
     .slice()
-    .reverse()
-    .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+    .sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+
+      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+    });
+
+  const totalPages = Math.ceil(sortedExpenses.length / ITEMS_PER_PAGE);
+
+  const paginatedExpenses = sortedExpenses.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <div className="  bg-[var(--bg-main)] p-0 md:p-4 mb-4">
@@ -228,6 +239,21 @@ const ViewExpense = () => {
             </div>
 
             <button
+              onClick={() => {
+                setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"));
+                setCurrentPage(1);
+              }}
+              title={sortOrder === "desc" ? "Newest first" : "Oldest first"}
+              className="flex items-center justify-center w-8 h-8 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-600 hover:text-white transition"
+            >
+              {sortOrder === "desc" ? (
+                <HiChevronDoubleDown className="text-lg" />
+              ) : (
+                <HiChevronDoubleUp className="text-lg" />
+              )}
+            </button>
+
+            <button
               onClick={() => downloadExpensesPDF(filteredExpenses, month, year)}
               className="flex items-center justify-center w-8 h-8 rounded-md bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition"
             >
@@ -312,9 +338,8 @@ const ViewExpense = () => {
               <button
                 key={i}
                 onClick={() => setCurrentPage(i + 1)}
-                className={`px-2 py-1 rounded border ${
-                  currentPage === i + 1 ? "bg-indigo-500 text-white" : ""
-                }`}
+                className={`px-2 py-1 rounded border ${currentPage === i + 1 ? "bg-indigo-500 text-white" : ""
+                  }`}
               >
                 {i + 1}
               </button>

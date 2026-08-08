@@ -29,10 +29,13 @@ export const getCategoryBreakdown = async (filters) => {
 };
 
 export const getSpendingTrends = async (filters) => {
-  const { startDate, endDate, interval = "monthly" } = filters;
-
+  const { startDate, endDate, interval = "monthly", category } = filters;
+  const params = new URLSearchParams({ startDate, endDate, interval });
+  if (category) {
+    params.append("category", category);
+  }
   const response = await fetch(
-    `https://expense-todo-five.vercel.app/api/expenses/analysis/spending-trends?startDate=${startDate}&endDate=${endDate}&interval=${interval}`,
+    `https://expense-todo-five.vercel.app/api/expenses/analysis/spending-trends?${params.toString()}`,
     {
       method: "GET",
       headers: {
@@ -41,16 +44,13 @@ export const getSpendingTrends = async (filters) => {
       },
     },
   );
-
   const isAuthValid = await checkAuth(response);
   if (!isAuthValid) {
     throw new Error("Authentication failed. Redirecting to login...");
   }
-
   if (!response.ok) {
     throw new Error(`Error fetching spending trends: ${response.statusText}`);
   }
-
   return response.json();
 };
 
@@ -198,5 +198,48 @@ export const getAIForecast = async (months) => {
     throw new Error(`Error fetching AI forecast: ${response.statusText}`);
   }
 
+  return response.json();
+};
+
+export const getCategories = async () => {
+  const response = await fetch(
+    "https://expense-todo-five.vercel.app/api/expenses/categories",
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `bearer ${localStorage.getItem("token")}`,
+      },
+    },
+  );
+  const isAuthValid = await checkAuth(response);
+  if (!isAuthValid) {
+    throw new Error("Authentication failed. Redirecting to login...");
+  }
+  if (!response.ok) {
+    throw new Error(`Error fetching categories: ${response.statusText}`);
+  }
+  return response.json();
+};
+
+export const searchExpenses = async ({ category, startDate, endDate }) => {
+  const params = new URLSearchParams({ category, startDate, endDate });
+  const response = await fetch(
+    `https://expense-todo-five.vercel.app/api/expenses/search?${params.toString()}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `bearer ${localStorage.getItem("token")}`,
+      },
+    },
+  );
+  const isAuthValid = await checkAuth(response);
+  if (!isAuthValid) {
+    throw new Error("Authentication failed. Redirecting to login...");
+  }
+  if (!response.ok) {
+    throw new Error(`Error searching expenses: ${response.statusText}`);
+  }
   return response.json();
 };

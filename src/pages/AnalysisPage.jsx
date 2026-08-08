@@ -9,6 +9,7 @@ import {
 import GraphCard from "../ui/GraphCard";
 import Filters from "../ui/Filters";
 import { useNavigate } from "react-router-dom";
+import CategoryAnalysis from "./CategoryAnalysis";
 
 const AnalysisPage = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const AnalysisPage = () => {
   const [lowExpenses, setLowExpenses] = useState([]);
   const [activePreset, setActivePreset] = useState("thisMonth");
   const [error, setError] = useState("");
+  const [showCategoryAnalysis, setShowCategoryAnalysis] = useState(false);
 
   const [filters, setFilters] = useState(() => {
     const today = new Date();
@@ -94,8 +96,8 @@ const AnalysisPage = () => {
     const topCategory =
       categoryBreakdown?.categoryBreakdown?.length > 0
         ? categoryBreakdown.categoryBreakdown.reduce((prev, current) =>
-            prev.amount > current.amount ? prev : current,
-          )
+          prev.amount > current.amount ? prev : current,
+        )
         : null;
 
     return {
@@ -187,15 +189,24 @@ const AnalysisPage = () => {
               key={key}
               onClick={() => applyDatePreset(key)}
               className={`px-3 py-1.5 text-xs rounded-md border transition
-                ${
-                  activePreset === key
-                    ? "bg-indigo-500 text-white border-indigo-500"
-                    : "bg-[var(--bg-main)] text-[var(--text-primary)] border-[var(--border-color)]"
+                ${activePreset === key
+                  ? "bg-indigo-500 text-white border-indigo-500"
+                  : "bg-[var(--bg-main)] text-[var(--text-primary)] border-[var(--border-color)]"
                 }`}
             >
               {label}
             </button>
           ))}
+
+          <button
+            onClick={() => setShowCategoryAnalysis((prev) => !prev)}
+            className={`px-3 py-1.5 text-xs rounded-md border transition ${showCategoryAnalysis
+              ? "bg-indigo-500 text-white border-indigo-500"
+              : "bg-[var(--bg-main)] text-[var(--text-primary)] border-[var(--border-color)]"
+              }`}
+          >
+            {showCategoryAnalysis ? "Hide Category Search" : "Search by Category"}
+          </button>
         </div>
 
         <Filters setFilters={handleFilterChange} currentFilters={filters} />
@@ -203,126 +214,129 @@ const AnalysisPage = () => {
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
       </div>
 
-      {/* SUMMARY CARDS */}
-      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="metric-card">
-          <div className="metric-value">
-            ₹{summaryMetrics.totalSpending.toLocaleString("en-IN")}
+      {showCategoryAnalysis ? <CategoryAnalysis /> :
+        <>
+
+          {/* SUMMARY CARDS */}
+          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="metric-card">
+              <div className="metric-value">
+                ₹{summaryMetrics.totalSpending.toLocaleString("en-IN")}
+              </div>
+              <div className="metric-label">Total Spending</div>
+            </div>
+
+            <div className="metric-card">
+              <div className="metric-value">₹{summaryMetrics.avgDailySpending}</div>
+              <div className="metric-label">Avg Daily Spending</div>
+            </div>
+
+            <div className="metric-card">
+              <div className="metric-value">{summaryMetrics.topCategory}</div>
+              <div className="metric-label">Top Category</div>
+            </div>
+
+            <div className="metric-card">
+              <div className="metric-value">{summaryMetrics.dataPoints}</div>
+              <div className="metric-label">Data Points</div>
+            </div>
           </div>
-          <div className="metric-label">Total Spending</div>
-        </div>
 
-        <div className="metric-card">
-          <div className="metric-value">₹{summaryMetrics.avgDailySpending}</div>
-          <div className="metric-label">Avg Daily Spending</div>
-        </div>
+          {/* CHARTS */}
+          <div className="grid gap-5 lg:grid-cols-2">
+            <div className="chart-card">
+              <GraphCard
+                title="Category Breakdown"
+                data={categoryBreakdown?.categoryBreakdown || []}
+                type="donut"
+              />
+            </div>
 
-        <div className="metric-card">
-          <div className="metric-value">{summaryMetrics.topCategory}</div>
-          <div className="metric-label">Top Category</div>
-        </div>
+            <div className="chart-card flex flex-col items-center">
+              <h4 className="chart-title">Weekly Spending Trends</h4>
 
-        <div className="metric-card">
-          <div className="metric-value">{summaryMetrics.dataPoints}</div>
-          <div className="metric-label">Data Points</div>
-        </div>
-      </div>
+              {spendingTrends?.xData?.length ? (
+                <LineChart
+                  xAxis={[
+                    {
+                      data: spendingTrends.xData,
+                      scaleType: "band",
+                      tickLabelStyle: {
+                        fill: "var(--text-primary)",
+                        fontSize: 11,
+                      },
+                    },
+                  ]}
+                  yAxis={[
+                    {
+                      tickLabelStyle: {
+                        fill: "var(--text-primary)",
+                        fontSize: 11,
+                      },
+                      valueFormatter: (v) =>
+                        `₹${Number(v).toLocaleString("en-IN")}`,
+                    },
+                  ]}
+                  series={[
+                    {
+                      data: spendingTrends.yData,
+                      color: "#818cf8",
+                    },
+                  ]}
+                  height={280}
+                  grid={{ vertical: true, horizontal: true }}
+                  sx={{
+                    /* axis text */
+                    "& .MuiChartsAxis-tickLabel": {
+                      fill: "var(--text-primary) !important",
+                    },
 
-      {/* CHARTS */}
-      <div className="grid gap-5 lg:grid-cols-2">
-        <div className="chart-card">
-          <GraphCard
-            title="Category Breakdown"
-            data={categoryBreakdown?.categoryBreakdown || []}
-            type="donut"
-          />
-        </div>
+                    /* legend text */
+                    "& .MuiChartsLegend-root text": {
+                      fill: "var(--text-primary) !important",
+                    },
 
-        <div className="chart-card flex flex-col items-center">
-          <h4 className="chart-title">Weekly Spending Trends</h4>
+                    /* axis lines */
+                    "& .MuiChartsAxis-line": {
+                      stroke: "var(--border-color)",
+                    },
 
-          {spendingTrends?.xData?.length ? (
-            <LineChart
-              xAxis={[
-                {
-                  data: spendingTrends.xData,
-                  scaleType: "band",
-                  tickLabelStyle: {
-                    fill: "var(--text-primary)",
-                    fontSize: 11,
-                  },
-                },
-              ]}
-              yAxis={[
-                {
-                  tickLabelStyle: {
-                    fill: "var(--text-primary)",
-                    fontSize: 11,
-                  },
-                  valueFormatter: (v) =>
-                    `₹${Number(v).toLocaleString("en-IN")}`,
-                },
-              ]}
-              series={[
-                {
-                  data: spendingTrends.yData,
-                  color: "#818cf8",
-                },
-              ]}
-              height={280}
-              grid={{ vertical: true, horizontal: true }}
-              sx={{
-                /* axis text */
-                "& .MuiChartsAxis-tickLabel": {
-                  fill: "var(--text-primary) !important",
-                },
+                    /* ticks */
+                    "& .MuiChartsAxis-tick": {
+                      stroke: "var(--border-color)",
+                    },
 
-                /* legend text */
-                "& .MuiChartsLegend-root text": {
-                  fill: "var(--text-primary) !important",
-                },
+                    /* grid lines */
+                    "& .MuiChartsGrid-line": {
+                      stroke: "var(--border-color)",
+                    },
+                  }}
+                />
+              ) : (
+                <p className="text-xs text-[var(--text-secondary)] py-8">
+                  No data available
+                </p>
+              )}
+            </div>
 
-                /* axis lines */
-                "& .MuiChartsAxis-line": {
-                  stroke: "var(--border-color)",
-                },
+            <div className="chart-card">
+              <GraphCard
+                title="Top Expenses"
+                data={topExpenses.topExpenses || []}
+                type="bar"
+              />
+            </div>
 
-                /* ticks */
-                "& .MuiChartsAxis-tick": {
-                  stroke: "var(--border-color)",
-                },
+            <div className="chart-card">
+              <GraphCard
+                title="Low Expenses"
+                data={lowExpenses.lowestExpenses || []}
+                type="bar"
+              />
+            </div>
+          </div>
 
-                /* grid lines */
-                "& .MuiChartsGrid-line": {
-                  stroke: "var(--border-color)",
-                },
-              }}
-            />
-          ) : (
-            <p className="text-xs text-[var(--text-secondary)] py-8">
-              No data available
-            </p>
-          )}
-        </div>
-
-        <div className="chart-card">
-          <GraphCard
-            title="Top Expenses"
-            data={topExpenses.topExpenses || []}
-            type="bar"
-          />
-        </div>
-
-        <div className="chart-card">
-          <GraphCard
-            title="Low Expenses"
-            data={lowExpenses.lowestExpenses || []}
-            type="bar"
-          />
-        </div>
-      </div>
-
-      <style jsx>{`
+          <style jsx>{`
         .metric-card {
           background: var(--bg-surface);
           border: 1px solid var(--border-color);
@@ -359,7 +373,11 @@ const AnalysisPage = () => {
           color: var(--text-primary);
         }
       `}</style>
+
+        </>}
     </div>
+
+
   );
 };
 
