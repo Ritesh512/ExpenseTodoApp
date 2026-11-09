@@ -25,7 +25,7 @@ const AddExpense = () => {
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        "https://expense-todo-five.vercel.app/api/expenses",
+        "http://localhost:3000/api/expenses",
         {
           method: "POST",
           headers: {

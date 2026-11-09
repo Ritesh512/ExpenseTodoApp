@@ -53,7 +53,7 @@ const Compare = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `https://expense-todo-five.vercel.app/api/expenses/filter/two-months?month1=${month1.value}&year1=${year1}&month2=${month2.value}&year2=${year2}`,
+        `http://localhost:3000/api/expenses/filter/two-months?month1=${month1.value}&year1=${year1}&month2=${month2.value}&year2=${year2}`,
         {
           headers: {
             "Content-Type": "application/json",

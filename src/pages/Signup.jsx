@@ -24,7 +24,7 @@ const Signup = () => {
 
       setLoading(true);
       const response = await fetch(
-        "https://expense-todo-five.vercel.app/api/users/signup",
+        "http://localhost:3000/api/users/signup",
         {
           method: "POST",
           body: JSON.stringify(userData),

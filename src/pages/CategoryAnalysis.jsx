@@ -50,7 +50,7 @@ const CategoryAnalysis = () => {
 
     // Change this endpoint if your backend uses a different route.
     const EXPENSE_SEARCH_API =
-        "https://expense-todo-five.vercel.app/api/expenses/search";
+        "http://localhost:3000/api/expenses/search";
 
     useEffect(() => {
         fetchCategories();

@@ -21,7 +21,7 @@ const Settings = () => {
 
     try {
       const response = await fetch(
-        "https://expense-todo-five.vercel.app/api/users/changePassword",
+        "http://localhost:3000/api/users/changePassword",
         {
           method: "POST",
           headers: {

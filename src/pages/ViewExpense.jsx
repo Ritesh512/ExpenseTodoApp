@@ -45,7 +45,7 @@ const ViewExpense = () => {
       setError(null);
 
       const response = await fetch(
-        `https://expense-todo-five.vercel.app/api/expenses/filter/month?month=${month}&year=${year}`,
+        `http://localhost:3000/api/expenses/filter/month?month=${month}&year=${year}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -74,7 +74,7 @@ const ViewExpense = () => {
 
     try {
       const response = await fetch(
-        `https://expense-todo-five.vercel.app/api/expenses/${id}`,
+        `http://localhost:3000/api/expenses/${id}`,
         {
           method: "DELETE",
           headers: {

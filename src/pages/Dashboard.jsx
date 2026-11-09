@@ -21,7 +21,7 @@ const Dashboard = () => {
         const token = localStorage.getItem("token");
 
         const profileRes = await fetch(
-          `https://expense-todo-five.vercel.app/api/users/profile/${user.userId}`,
+          `http://localhost:3000/api/users/profile/${user.userId}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -40,7 +40,7 @@ const Dashboard = () => {
         setProfile(profileData);
 
         const todoRes = await fetch(
-          "https://expense-todo-five.vercel.app/api/users/todo/lists/summary",
+          "http://localhost:3000/api/users/todo/lists/summary",
           {
             headers: {
               "Content-Type": "application/json",
@@ -52,7 +52,7 @@ const Dashboard = () => {
         setTodo(await todoRes.json());
 
         const expenseRes = await fetch(
-          "https://expense-todo-five.vercel.app/api/expenses/dashboard/report",
+          "http://localhost:3000/api/expenses/dashboard/report",
           {
             headers: {
               "Content-Type": "application/json",

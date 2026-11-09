@@ -2,10 +2,12 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import BottomNav from "./BottomNav";
 import Header from "./Header";
+import TodoReminderMonitor from "./TodoReminderMonitor";
 
 function AppLayout({ theme, toggleTheme }) {
   return (
     <div className="min-h-screen bg-main">
+      <TodoReminderMonitor />
       <Sidebar />
 
       <div className="lg:ml-56 flex flex-col min-h-screen">

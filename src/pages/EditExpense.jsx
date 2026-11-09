@@ -37,7 +37,7 @@ const EditExpense = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `https://expense-todo-five.vercel.app/api/expenses/${id}`,
+          `http://localhost:3000/api/expenses/${id}`,
           {
             method: "GET",
             headers: {
@@ -72,7 +72,7 @@ const EditExpense = () => {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        `https://expense-todo-five.vercel.app/api/expenses/${id}`,
+        `http://localhost:3000/api/expenses/${id}`,
         {
           method: "PUT",
           headers: {
