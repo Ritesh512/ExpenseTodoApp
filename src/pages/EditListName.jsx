@@ -14,7 +14,7 @@ const EditListName = () => {
     const fetchLists = async () => {
       try {
         const response = await fetch(
-          "https://expense-todo-five.vercel.app/api/users/todo/lists",
+          "http://localhost:3000/api/users/todo/lists",
           {
             headers: {
               "Content-Type": "application/json",
@@ -52,7 +52,7 @@ const EditListName = () => {
   const handleDelete = async (listId) => {
     try {
       const response = await fetch(
-        `https://expense-todo-five.vercel.app/api/users/todo/lists/${listId}`,
+        `http://localhost:3000/api/users/todo/lists/${listId}`,
         {
           method: "DELETE",
           headers: {
@@ -120,8 +120,7 @@ const EditListName = () => {
           listNames.map((list) => (
             <div
               key={list.value}
-              className="flex items-center justify-between px-4 py-3 rounded-lg border"
-              style={{ borderColor: "var(--border-color)" }}
+              className="todo-row-card flex items-center justify-between px-4 py-3 rounded-lg border"
             >
               <span
                 className="text-sm md:text-base font-medium"

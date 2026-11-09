@@ -55,6 +55,33 @@ html.dark {
   --color-brand-500: #818cf8;
 }
 
+.todo-row-card {
+  background: var(--bg-main);
+  border-color: #cbd5e1;
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.todo-row-card:hover,
+.todo-row-card:focus-within {
+  transform: translateY(-2px);
+  border-color: #818cf8;
+  box-shadow: var(--shadow-md);
+}
+
+html.dark .todo-row-card {
+  border-color: #3a414a;
+}
+
+html.dark .todo-row-card:hover,
+html.dark .todo-row-card:focus-within {
+  border-color: #818cf8;
+}
+
 /* Page background */
 
 body {

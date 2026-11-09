@@ -2,13 +2,13 @@
 
 ## Description
 
-This app is designed to help users organize their daily tasks and expenses efficiently. With separate functionalities for managing to-dos, tracking expenses, and a dashboard to visualize data, it serves as an all-in-one solution for personal productivity and financial management.
+This app is designed to help users organize their Daily Tasks and expenses efficiently. With separate functionalities for managing to-dos, tracking expenses, and a dashboard to visualize data, it serves as an all-in-one solution for personal productivity and financial management.
 
 ---
 
 ## Live Demo
 
-Access the app here: [Expense and To-Do Tracker](https://expense-todo-five.vercel.app/)
+Access the app here: [Expense and To-Do Tracker](http://localhost:3000/)
 
 ---
 
@@ -17,7 +17,12 @@ Access the app here: [Expense and To-Do Tracker](https://expense-todo-five.verce
 ### 1. **To-Do List Management**
 
 - Create multiple lists for different categories (e.g., _Food_, _Work_, _Personal_).
-- Add, edit, and delete individual tasks.
+- Choose daily, weekly, monthly, yearly, or regular (one-time) lists.
+- Add and delete tasks; mark them complete, with pending tasks shown first.
+- Recurring task completion resets with the list period.
+- Optional list reminders run at a chosen local time while the app is open:
+  daily lists remind daily, weekly lists on Sundays, monthly lists every
+  Sunday, and yearly lists on the first of each month.
 - Example:
   - List: _Groceries_
   - Task: _Buy 1kg apples_
@@ -89,14 +94,13 @@ npm run dev
 Once the server is running, open your browser and navigate to:
 
 ```bash
-https://expense-todo-five.vercel.app
+http://localhost:3000
 ```
 
 ---
 
 ### Future Enhancements
 
-- Reminder Notifications: Add reminders for overdue to-dos or monthly budget thresholds.
 - Export Data: Allow exporting expenses as CSV or Excel files.
 - Mobile App: Develop a mobile version for easier access.
 

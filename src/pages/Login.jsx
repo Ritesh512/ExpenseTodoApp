@@ -22,7 +22,7 @@ const Login = () => {
 
     try {
       let result = await fetch(
-        "https://expense-todo-five.vercel.app/api/users/login",
+        "http://localhost:3000/api/users/login",
         {
           method: "POST",
           body: JSON.stringify({ email, password }),

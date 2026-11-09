@@ -4,7 +4,7 @@ export const getCategoryBreakdown = async (filters) => {
   const { startDate, endDate } = filters;
 
   const response = await fetch(
-    `https://expense-todo-five.vercel.app/api/expenses/analysis/category-breakdown?startDate=${startDate}&endDate=${endDate}`,
+    `http://localhost:3000/api/expenses/analysis/category-breakdown?startDate=${startDate}&endDate=${endDate}`,
     {
       method: "GET",
       headers: {
@@ -35,7 +35,7 @@ export const getSpendingTrends = async (filters) => {
     params.append("category", category);
   }
   const response = await fetch(
-    `https://expense-todo-five.vercel.app/api/expenses/analysis/spending-trends?${params.toString()}`,
+    `http://localhost:3000/api/expenses/analysis/spending-trends?${params.toString()}`,
     {
       method: "GET",
       headers: {
@@ -58,7 +58,7 @@ export const getTopExpenses = async (filters) => {
   const { startDate, endDate, limit = 5 } = filters;
 
   const response = await fetch(
-    `https://expense-todo-five.vercel.app/api/expenses/analysis/top-expenses?startDate=${startDate}&endDate=${endDate}&limit=${limit}`,
+    `http://localhost:3000/api/expenses/analysis/top-expenses?startDate=${startDate}&endDate=${endDate}&limit=${limit}`,
     {
       method: "GET",
       headers: {
@@ -84,7 +84,7 @@ export const getLowExpenses = async (filters) => {
   const { startDate, endDate, limit = 5 } = filters;
 
   const response = await fetch(
-    `https://expense-todo-five.vercel.app/api/expenses/analysis/low-expenses?startDate=${startDate}&endDate=${endDate}&limit=${limit}`,
+    `http://localhost:3000/api/expenses/analysis/low-expenses?startDate=${startDate}&endDate=${endDate}&limit=${limit}`,
     {
       method: "GET",
       headers: {
@@ -109,7 +109,7 @@ export const getLowExpenses = async (filters) => {
 // AI Analysis API
 export const getAIAnalysis = async (startDate, endDate) => {
   const response = await fetch(
-    `https://expense-todo-five.vercel.app/api/ai/analysis?startDate=${startDate}&endDate=${endDate}`,
+    `http://localhost:3000/api/ai/analysis?startDate=${startDate}&endDate=${endDate}`,
     {
       method: "GET",
       headers: {
@@ -140,7 +140,7 @@ export const getAIAnalysis = async (startDate, endDate) => {
 // AI Recommendations API
 export const getAIRecommendations = async (month, year) => {
   const response = await fetch(
-    `https://expense-todo-five.vercel.app/api/ai/recommendations?month=${month}&year=${year}`,
+    `http://localhost:3000/api/ai/recommendations?month=${month}&year=${year}`,
     {
       method: "GET",
       headers: {
@@ -173,7 +173,7 @@ export const getAIRecommendations = async (month, year) => {
 // AI Forecast API
 export const getAIForecast = async (months) => {
   const response = await fetch(
-    `https://expense-todo-five.vercel.app/api/ai/forecast?months=${months}`,
+    `http://localhost:3000/api/ai/forecast?months=${months}`,
     {
       method: "GET",
       headers: {
@@ -203,7 +203,7 @@ export const getAIForecast = async (months) => {
 
 export const getCategories = async () => {
   const response = await fetch(
-    "https://expense-todo-five.vercel.app/api/expenses/categories",
+    "http://localhost:3000/api/expenses/categories",
     {
       method: "GET",
       headers: {
@@ -225,7 +225,7 @@ export const getCategories = async () => {
 export const searchExpenses = async ({ category, startDate, endDate }) => {
   const params = new URLSearchParams({ category, startDate, endDate });
   const response = await fetch(
-    `https://expense-todo-five.vercel.app/api/expenses/search?${params.toString()}`,
+    `http://localhost:3000/api/expenses/search?${params.toString()}`,
     {
       method: "GET",
       headers: {
